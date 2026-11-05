@@ -8,6 +8,8 @@
 > Download a zip from the Releases page, extract it and run `FDLike2026.exe` (.NET 8 Desktop Runtime required).
 > Licensed under MIT. See [Acknowledgements](#謝辞--acknowledgements) below.
 
+![FDLike2026 のメイン画面（Classic 配色）](docs/screenshot.png)
+
 MS-DOS 時代の FD、そして Windows で長く使われた WinFM2008。「キーボードだけで気持ちよくファイルを扱える」あの操作感を Windows 11 でも使い続けたくて作った、ゼロから書き起こした独立したソフトです。WinFM2008 のコードは含まず、作者とも無関係です（詳しくは[謝辞](#謝辞--acknowledgements)）。
 
 ## 特徴
@@ -15,6 +17,8 @@ MS-DOS 時代の FD、そして Windows で長く使われた WinFM2008。「キ
 - **WinFM2008 互換のキー配置と画面構成**。ファンクション行、ボリューム情報 / パス / 属性の情報ボックス、ツリー＋左右ウィンドウ、メッセージ行。配色「Classic」は紺地にシアン枠・黄色数字。
 - **1 キーで操作**: C 複写 / M 移動 / D 削除 / N 名前 / A 属性 / E 編集 / R 実行 / V ビューア / T ツリー / J JumpFolder / F 検索 / Shift+F grep / P・U zip 圧縮・解凍 ほか（[キー操作](#キー操作winfm2008-準拠)）。
 - **ビューア（V）**: テキスト / HEX、Markdown 整形表示、ソースの色分け＋行番号、画像（GIF アニメ対応）、CSV / TSV の表、PDF / HTML（WebView2）、Word / Excel / PowerPoint の抽出テキスト。
+
+  ![ビューアで README.md を Markdown 表示](docs/screenshot-viewer.png)
 - **grep（Shift+F）**: 文字列検索の結果から移動・該当行をビューア / エディタで開く・ヒットした全ファイルにタグ。**docx / xlsx / pptx / PDF の中身も検索**（旧形式 .doc / .xls / .ppt / .rtf / .msg などは Office の IFilter 経由）。
 - **Windows との連携**: エクスプローラーとのドラッグ＆ドロップ / コピー＆貼り付け、右クリックから Windows のシェルメニュー（7-Zip・送る・プロパティなど）、ごみ箱、Enter はシステムの関連付けで開く、Teams などから貼り付けた `\\server\share` や `file://` のパスへそのまま移動。
 - **カスタマイズ（F10）**: 配色 12 種（Classic / DOS 16色 / ダーク / ライト / VS Code 系 6 種 / ユニバーサル 2 種）と約 40 項目の色指定、フォント、表示モード、エディタ・比較ツールの指定。F2 のコマンドマクロ、F4 の拡張子対応。
