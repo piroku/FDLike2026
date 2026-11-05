@@ -1,0 +1,72 @@
+<Window x:Class="FDLike2026.Views.SortDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="オブジェクトのソート" Width="340" SizeToContent="Height" ResizeMode="NoResize"
+        TextOptions.TextFormattingMode="{DynamicResource TextFormattingMode}"
+        TextOptions.TextRenderingMode="{DynamicResource TextRenderingMode}"
+        RenderOptions.ClearTypeHint="Enabled"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource OtherBgBrush}" FontFamily="{DynamicResource OtherFontFamily}" FontSize="{DynamicResource OtherFontSize}"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <!-- WinFM2008 と同じ: 縦に並んだキー選択ボタン。選択中は選択色で示す -->
+        <Style x:Key="KeyButton" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="Background" Value="#40000000"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SelBgBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource SelFgBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource OtherFgBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource OtherFgBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#40000000"/>
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="14,12">
+        <ToggleButton x:Name="KeyName" Style="{StaticResource KeyButton}" Content="名前順(N)" Click="Key_Click"/>
+        <ToggleButton x:Name="KeyExt"  Style="{StaticResource KeyButton}" Content="拡張子名順(E)" Click="Key_Click"/>
+        <ToggleButton x:Name="KeyDate" Style="{StaticResource KeyButton}" Content="日付順(D)" Click="Key_Click"/>
+        <ToggleButton x:Name="KeySize" Style="{StaticResource KeyButton}" Content="ファイル サイズ順(S)" Click="Key_Click"/>
+        <ToggleButton x:Name="KeyNone" Style="{StaticResource KeyButton}" Content="ソートなし(X)" Click="Key_Click"/>
+
+        <TextBlock x:Name="Hint" Foreground="{DynamicResource OtherDimBrush}" Margin="0,4,0,8"
+                   Text="キーを選んでから 昇順(U) / 降順(R) で決定。Enter = 昇順、Shift+Enter = 降順。"/>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" x:Name="AscButton"  Content="昇順(U)" Click="Asc_Click"/>
+            <Button Grid.Column="1" x:Name="DescButton" Content="降順(R)" Click="Desc_Click"/>
+            <Button Grid.Column="2" Content="キャンセル" Click="Cancel_Click" IsCancel="True" Margin="0"/>
+        </Grid>
+    </StackPanel>
+</Window>

@@ -1,0 +1,47 @@
+<Window x:Class="FDLike2026.Views.OverwriteDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="複写・移動の方法" Width="640" SizeToContent="Height" ResizeMode="NoResize"
+        TextOptions.TextFormattingMode="{DynamicResource TextFormattingMode}"
+        TextOptions.TextRenderingMode="{DynamicResource TextRenderingMode}"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource OtherBgBrush}" FontFamily="{DynamicResource OtherFontFamily}" FontSize="{DynamicResource OtherFontSize}"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#40000000"/>
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Margin" Value="0,3"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+        </Style>
+    </Window.Resources>
+    <Border Style="{StaticResource Frame}" Margin="8">
+        <StackPanel Margin="10">
+            <TextBlock Text="同じ名前のファイルがあります。" Foreground="{DynamicResource InfoTitleBrush}" Margin="0,0,0,8"/>
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/><RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="複写元: " Foreground="{DynamicResource InfoItemBrush}"/>
+                <TextBlock Grid.Column="1" x:Name="SrcText" TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="1" Text="複写先: " Foreground="{DynamicResource InfoItemBrush}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DstText" TextWrapping="Wrap"/>
+            </Grid>
+            <Button Content="(_O) 上書きで複写・移動する" Click="B_Overwrite"/>
+            <Button Content="(_N) タイムスタンプが新しい時に複写・移動する" Click="B_Newer"/>
+            <Button Content="(_R) 名前を変えて複写・移動する（自動で (2) など）" Click="B_Rename"/>
+            <Button Content="(_S) 複写・移動しない" Click="B_Skip"/>
+            <Button Content="(_C) 中断　Esc" Click="B_Cancel"/>
+            <CheckBox x:Name="AllCheck" Content="以後同設定(_A)" Foreground="{DynamicResource OtherFgBrush}" Margin="0,8,0,0"/>
+        </StackPanel>
+    </Border>
+</Window>

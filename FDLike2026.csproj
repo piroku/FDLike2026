@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <AssemblyName>FDLike2026</AssemblyName>
+    <RootNamespace>FDLike2026</RootNamespace>
+    <Version>0.2.3</Version>
+    <Product>FDLike2026</Product>
+    <Description>WinFM2008 の流れをくむ、キーボード中心のファイルメンテナンスツール（Windows 11 対応）</Description>
+    <!-- 配布: tools\publish.ps1（README.md の「配布」も参照） -->
+    <SatelliteResourceLanguages>ja</SatelliteResourceLanguages>
+    <!-- WFAC010: 高DPI は WPF 側（app.manifest の PerMonitorV2）で設定するため WinForms の警告は抑止 -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+  </PropertyGroup>
+
+  <!-- WinForms は ColorDialog のためだけに参照。暗黙 using は WPF と型名が衝突するので外す -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Markdown ビューア（V で .md を開いたときの整形表示） -->
+    <PackageReference Include="Markdig" Version="0.37.0" />
+    <!-- 画像ビューアの GIF アニメーション -->
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+    <!-- PDF / HTML ビューア（Edge のエンジン。Windows 11 標準の WebView2 ランタイムを使う） -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+    <!-- Markdown 表示のカラー絵文字（WPF 標準は単色のため） -->
+    <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
+    <!-- grep / ビューアで PDF からテキストを取り出す（MIT） -->
+    <PackageReference Include="PdfPig" Version="0.1.9" />
+  </ItemGroup>
+</Project>

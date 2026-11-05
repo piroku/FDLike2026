@@ -1,0 +1,109 @@
+<Window x:Class="FDLike2026.Views.ViewerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="FDLike2026 - ビューア" Width="1100" Height="760"
+        TextOptions.TextFormattingMode="{DynamicResource TextFormattingMode}"
+        TextOptions.TextRenderingMode="{DynamicResource TextRenderingMode}"
+        RenderOptions.ClearTypeHint="Enabled"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgBrush}" FontFamily="{DynamicResource MonoFont}" FontSize="{DynamicResource BaseFontSize}"
+        Cursor="Arrow" ForceCursor="True"
+        Activated="Window_Activated" PreviewKeyDown="Window_PreviewKeyDown">
+    <DockPanel Margin="4">
+        <Border DockPanel.Dock="Top" Style="{StaticResource Frame}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="Header" Style="{StaticResource Label}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1" Style="{StaticResource Mono}" Foreground="{DynamicResource DimBrush}"
+                           x:Name="KeyHint" Text="/: 検索  n/N: 次/前　H: HEX　E: エディタ　W: 折返し　Esc/Q: 閉じる"/>
+            </Grid>
+        </Border>
+        <Border Style="{StaticResource Frame}">
+          <Grid>
+            <!-- PDF / HTML（WebView2 = Edge のビューア） -->
+            <Grid x:Name="WebHost" Visibility="Collapsed" Background="#FF202020">
+                <wv2:WebView2 x:Name="Web" DefaultBackgroundColor="#202020"/>
+                <TextBlock x:Name="WebMessage" Foreground="{DynamicResource OtherDimBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           TextWrapping="Wrap" MaxWidth="600" Visibility="Collapsed"/>
+            </Grid>
+            <!-- 画像ビューア（jpg / png / gif / bmp / ico / webp / tiff） -->
+            <ScrollViewer x:Name="ImgScroll" Visibility="Collapsed" Background="#FF202020"
+                          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                          SizeChanged="ImgScroll_SizeChanged" PreviewMouseWheel="ImgScroll_MouseWheel"
+                          PreviewMouseLeftButtonDown="Img_MouseDown" PreviewMouseMove="Img_MouseMove" PreviewMouseLeftButtonUp="Img_MouseUp">
+                <Image x:Name="Img" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"/>
+            </ScrollViewer>
+            <!-- CSV / TSV の表表示（M でテキストと切替、T で先頭行を見出しに） -->
+            <DataGrid x:Name="TableView" Visibility="Collapsed" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" CanUserResizeColumns="True" CanUserReorderColumns="False" CanUserSortColumns="True"
+                      SelectionMode="Extended" SelectionUnit="Cell" ClipboardCopyMode="IncludeHeader"
+                      Background="Transparent" RowBackground="Transparent" AlternatingRowBackground="#18FFFFFF"
+                      Foreground="{DynamicResource OtherFgBrush}" BorderThickness="0"
+                      GridLinesVisibility="All" HorizontalGridLinesBrush="#40FFFFFF" VerticalGridLinesBrush="#40FFFFFF"
+                      FontFamily="{DynamicResource ListFontFamily}" FontSize="{DynamicResource ListFontSize}"
+                      EnableRowVirtualization="True" EnableColumnVirtualization="True"
+                      RowHeaderWidth="48" LoadingRow="TableView_LoadingRow">
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource SelBgColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{DynamicResource SelFgColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource SelBgColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="{DynamicResource SelFgColor}"/>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="{DynamicResource InfoBgBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource InfoTitleBrush}"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="Padding" Value="6,2"/>
+                    </Style>
+                    <Style TargetType="DataGridRowHeader">
+                        <Setter Property="Background" Value="{DynamicResource InfoBgBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource OtherDimBrush}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="Padding" Value="4,0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Padding" Value="6,1"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border x:Name="Bd" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SelBgBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource SelFgBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.Resources>
+            </DataGrid>
+            <!-- Markdown 整形表示（.md のとき。M でテキストと切替） -->
+            <FlowDocumentScrollViewer x:Name="MdView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" SizeChanged="MdView_SizeChanged"
+                                      Background="Transparent" Foreground="{DynamicResource OtherFgBrush}" IsToolBarVisible="False"
+                                      FontFamily="{DynamicResource OtherFontFamily}" FontSize="{DynamicResource OtherFontSize}"/>
+            <TextBox x:Name="Body" IsReadOnly="True" IsReadOnlyCaretVisible="True"
+                     Background="Transparent" Foreground="White" BorderThickness="0" CaretBrush="White"
+                     SelectionBrush="{DynamicResource SelBgBrush}" SelectionOpacity="0.85" SelectionTextBrush="{DynamicResource SelFgBrush}"
+                     IsInactiveSelectionHighlightEnabled="True"
+                     FontFamily="{DynamicResource MonoFont}" FontSize="{DynamicResource BaseFontSize}"
+                     TextBlock.LineHeight="{DynamicResource ViewerLineHeight}" TextBlock.LineStackingStrategy="BlockLineHeight"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                     AcceptsReturn="True" TextWrapping="NoWrap"/>
+          </Grid>
+        </Border>
+    </DockPanel>
+</Window>

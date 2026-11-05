@@ -1,0 +1,34 @@
+<Window x:Class="FDLike2026.Views.ListDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FDLike2026" Width="520" SizeToContent="Height" MaxHeight="600" ResizeMode="NoResize"
+        TextOptions.TextFormattingMode="{DynamicResource TextFormattingMode}"
+        TextOptions.TextRenderingMode="{DynamicResource TextRenderingMode}"
+        RenderOptions.ClearTypeHint="Enabled"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource BgBrush}" FontFamily="{DynamicResource MonoFont}" FontSize="{DynamicResource BaseFontSize}"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Border Style="{StaticResource Frame}" Margin="8">
+        <StackPanel Margin="8">
+            <TextBlock x:Name="PromptText" Style="{StaticResource Label}" Margin="0,0,0,8"/>
+            <ListBox x:Name="List" Background="Transparent" BorderThickness="0" Foreground="White"
+                     MouseDoubleClick="List_MouseDoubleClick">
+                <ListBox.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{DynamicResource SelBgColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{DynamicResource SelFgColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{DynamicResource SelBgColor}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="{DynamicResource SelFgColor}"/>
+                </ListBox.Resources>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Style="{StaticResource Mono}">
+                            <Run Text="{Binding Key, Mode=OneWay}" Foreground="{DynamicResource LabelBrush}"/><Run Text=": "/><Run Text="{Binding Label, Mode=OneWay}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Style="{StaticResource Mono}" Foreground="{DynamicResource DimBrush}" Margin="0,8,0,0"
+                       Text="文字キー / Enter: 選択　　Esc: 取消"/>
+        </StackPanel>
+    </Border>
+</Window>

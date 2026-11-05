@@ -1,0 +1,82 @@
+<Window x:Class="FDLike2026.Views.AssocWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="拡張子の対応" Width="900" Height="560" MinWidth="600" MinHeight="360"
+        TextOptions.TextFormattingMode="{DynamicResource TextFormattingMode}"
+        TextOptions.TextRenderingMode="{DynamicResource TextRenderingMode}"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource OtherBgBrush}" FontFamily="{DynamicResource OtherFontFamily}" FontSize="{DynamicResource OtherFontSize}"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style x:Key="Row" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="4,1"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd" Background="Transparent" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SelBgBrush}"/>
+                                <Setter Property="TextElement.Foreground" Value="{DynamicResource SelFgBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#40000000"/>
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="MinWidth" Value="100"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel Margin="4">
+        <Border DockPanel.Dock="Bottom" Style="{StaticResource Frame}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="追加(_A)　Ins" Click="Add_Click"/>
+                    <Button Content="編集(_E)　Enter" Click="Edit_Click"/>
+                    <Button Content="削除(_D)　Del" Click="Delete_Click"/>
+                    <Button Content="閉じる　Esc" Click="Close_Click" Margin="0"/>
+                </StackPanel>
+                <TextBlock Style="{StaticResource Mono}" Foreground="{DynamicResource OtherDimBrush}" TextWrapping="Wrap" Margin="0,0,12,0"
+                           Text="Enter キーで開くとき、ここの対応がシステムの関連付けより優先されます。拡張子はピリオドなし、ワイルドカード可（例: txt / md / *.log → log / jp*）。コマンドは $ マクロが使えます（$Q$P\$C$Q = カレントファイルのフルパス）。"/>
+            </DockPanel>
+        </Border>
+        <Border Style="{StaticResource Frame}">
+            <DockPanel>
+                <Grid DockPanel.Dock="Top" Margin="4,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource Label}" Text="拡張子"/>
+                    <TextBlock Grid.Column="1" Style="{StaticResource Label}" Text="プログラム / マクロ"/>
+                </Grid>
+                <ListBox x:Name="List" Background="Transparent" BorderThickness="0" Focusable="False" Foreground="{DynamicResource OtherFgBrush}"
+                         ItemContainerStyle="{StaticResource Row}" KeyboardNavigation.DirectionalNavigation="None"
+                         MouseDoubleClick="List_DoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Ext, Mode=OneWay}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Command, Mode=OneWay}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</Window>

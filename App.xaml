@@ -1,0 +1,128 @@
+<Application x:Class="FDLike2026.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- WinFM2008 風の配色 -->
+        <SolidColorBrush x:Key="BgBrush"        Color="#FF000080"/>
+        <SolidColorBrush x:Key="FrameBrush"     Color="#FF5555FF"/>
+        <SolidColorBrush x:Key="LabelBrush"     Color="#FFFFFF55"/>
+        <SolidColorBrush x:Key="TextBrush"      Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="DimBrush"       Color="#FFAAAAAA"/>
+        <SolidColorBrush x:Key="NumberBrush"    Color="#FFFFFF55"/>
+        <SolidColorBrush x:Key="DirBrush"       Color="#FF55FF55"/>
+        <SolidColorBrush x:Key="HiddenBrush"    Color="#FF5555FF"/>
+        <SolidColorBrush x:Key="SystemBrush"    Color="#FFFF55FF"/>
+        <SolidColorBrush x:Key="TagBrush"       Color="#FF55FFFF"/>
+        <SolidColorBrush x:Key="CursorBrush"    Color="#FFFF55FF"/>
+        <SolidColorBrush x:Key="CursorFgBrush"  Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="ClockBrush"     Color="#FF55FF55"/>
+        <SolidColorBrush x:Key="InactiveCursorBrush" Color="#FF555555"/>
+        <SolidColorBrush x:Key="HeadingBrush"   Color="#FFFFFF00"/>
+        <SolidColorBrush x:Key="KeyLetterBrush" Color="#FF0000FF"/>
+        <SolidColorBrush x:Key="KeyLabelBrush"  Color="#FFFFFFFF"/>
+
+        <!-- 既定値（起動時に Services/ThemeService が settings.json の内容で上書きする） -->
+        <SolidColorBrush x:Key="ListBgBrush" Color="#FF000040"/>
+        <SolidColorBrush x:Key="InfoBgBrush" Color="#FF000040"/>
+        <SolidColorBrush x:Key="OtherBgBrush" Color="#FF000040"/>
+        <SolidColorBrush x:Key="OtherFgBrush" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="OtherDimBrush" Color="#FF808080"/>
+        <SolidColorBrush x:Key="SelBgBrush" Color="#FFFFFF00"/>
+        <SolidColorBrush x:Key="SelFgBrush" Color="#FF000040"/>
+        <SolidColorBrush x:Key="FileBrush" Color="#FFFFFF00"/>
+        <SolidColorBrush x:Key="FileNameBrush" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="InfoItemBrush" Color="#FF00FFFF"/>
+        <SolidColorBrush x:Key="InfoDataBrush" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="InfoTitleBrush" Color="#FFFFFF00"/>
+        <SolidColorBrush x:Key="InfoTimeBrush" Color="#FF00FF00"/>
+        <SolidColorBrush x:Key="FuncKeyBgBrush" Color="#FF0000FF"/>
+        <SolidColorBrush x:Key="FuncKeyFgBrush" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="FuncLabelBrush" Color="#FFFFFFFF"/>
+        <FontFamily x:Key="OtherFontFamily">BIZ UDゴシック, MS Gothic, ＭＳ ゴシック, Consolas</FontFamily>
+        <sys:Double x:Key="OtherFontSize">16</sys:Double>
+        <FontWeight x:Key="OtherFontWeight">Normal</FontWeight>
+        <Thickness x:Key="ListRowPadding">2,1,2,2</Thickness>
+        <Thickness x:Key="TreeRowPadding">2,1,2,2</Thickness>
+        <GridLength x:Key="ListColTag">14</GridLength>
+        <GridLength x:Key="ListColExt">56</GridLength>
+        <GridLength x:Key="ListColSize">100</GridLength>
+        <GridLength x:Key="ListColDate">80</GridLength>
+        <GridLength x:Key="ListColTime">50</GridLength>
+        <GridLength x:Key="ListColAttr">50</GridLength>
+        <GridLength x:Key="InfoColNum">150</GridLength>
+        <GridLength x:Key="InfoColCount">60</GridLength>
+        <GridLength x:Key="InfoColAttr">96</GridLength>
+        <TextRenderingMode x:Key="TextRenderingMode">ClearType</TextRenderingMode>
+        <TextFormattingMode x:Key="TextFormattingMode">Ideal</TextFormattingMode>
+        <sys:String x:Key="TagMarkText">▶</sys:String>
+        <Visibility x:Key="IconVisibility">Visible</Visibility>
+        <Visibility x:Key="IconOffVisibility">Collapsed</Visibility>
+        <GridLength x:Key="ListColIcon">20</GridLength>
+        <GridLength x:Key="ListColName">*</GridLength>
+        <GridLength x:Key="ListColGit">36</GridLength>
+        <SolidColorBrush x:Key="GitModifiedBrush" Color="#FFE2C08D"/>
+        <SolidColorBrush x:Key="GitUntrackedBrush" Color="#FF73C991"/>
+        <SolidColorBrush x:Key="GitAddedBrush" Color="#FF73C991"/>
+        <SolidColorBrush x:Key="GitDeletedBrush" Color="#FFF14C4C"/>
+        <SolidColorBrush x:Key="GitIgnoredBrush" Color="#FF8C8C8C"/>
+        <GridLength x:Key="ListColFill">0</GridLength>
+        <FontFamily x:Key="MonoFont">BIZ UDゴシック, MS Gothic, ＭＳ ゴシック, Consolas</FontFamily>
+        <sys:Double x:Key="BaseFontSize">16</sys:Double>
+        <sys:Double x:Key="ViewerLineHeight">24</sys:Double>
+        <sys:Double x:Key="HeaderFontSize">18</sys:Double>
+        <!-- 上の既定値は起動時に Services/ThemeService が settings.json の内容で上書きする -->
+
+        <Style TargetType="TextBlock" x:Key="Mono">
+            <Setter Property="FontFamily" Value="{DynamicResource OtherFontFamily}"/>
+            <Setter Property="FontSize" Value="{DynamicResource OtherFontSize}"/>
+            <Setter Property="FontWeight" Value="{DynamicResource OtherFontWeight}"/>
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource Mono}" x:Key="Label">
+            <Setter Property="Foreground" Value="{DynamicResource LabelBrush}"/>
+        </Style>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource Mono}" x:Key="Number">
+            <Setter Property="Foreground" Value="{DynamicResource NumberBrush}"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+        <Style TargetType="Border" x:Key="Frame">
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="4,2"/>
+        </Style>
+
+        <!-- ダイアログの ListView 行: 選択行を黄色帯＋紺文字で（標準テンプレートの水色を使わない） -->
+        <Style x:Key="FdListViewItem" TargetType="ListViewItem">
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="Padding" Value="2,1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border x:Name="Bd" Background="Transparent" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                            <GridViewRowPresenter Content="{TemplateBinding Content}" Columns="{TemplateBinding GridView.ColumnCollection}"
+                                                  VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SelBgBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource SelFgBrush}"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsSelected" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="#30FFFFFF"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

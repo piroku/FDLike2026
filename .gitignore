@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+*.user
+
+build.log
+*.log
+docs/_shot.png
+publish/

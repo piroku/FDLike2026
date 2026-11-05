@@ -1,0 +1,149 @@
+<Window x:Class="FDLike2026.Views.RenameSeqDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="名前の一括変換" Width="900" Height="640" MinWidth="700" MinHeight="480"
+        TextOptions.TextFormattingMode="{DynamicResource TextFormattingMode}"
+        TextOptions.TextRenderingMode="{DynamicResource TextRenderingMode}"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource OtherBgBrush}" FontFamily="{DynamicResource OtherFontFamily}" FontSize="{DynamicResource OtherFontSize}"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#40000000"/>
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="Padding" Value="4,1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#40000000"/>
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="MinWidth" Value="100"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="Margin" Value="0,3"/>
+        </Style>
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="{DynamicResource OtherFgBrush}"/>
+            <Setter Property="Margin" Value="0,2,12,2"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource InfoItemBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Foreground" Value="{DynamicResource InfoTitleBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel Margin="10">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <TextBlock x:Name="SummaryText" Foreground="{DynamicResource OtherDimBrush}" Margin="0,0,16,0"/>
+            <Button Content="実行 (Enter)" Click="Ok_Click" IsDefault="True"/>
+            <Button Content="キャンセル (Esc)" Click="Cancel_Click" IsCancel="True" Margin="0"/>
+        </StackPanel>
+
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Grid.Column="0">
+                <GroupBox.Header><CheckBox x:Name="NameCheck" Content="ファイル名の変更" IsChecked="True" Checked="Changed" Unchecked="Changed" Margin="0"/></GroupBox.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox Grid.ColumnSpan="2" x:Name="ReuseCheck" Content="既存の名前を流用（現在の名前に番号を付ける）" Checked="Changed" Unchecked="Changed"/>
+                    <TextBlock Grid.Row="1" Text="固定文字列:" Margin="0,0,8,0"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="NameFixedBox" TextChanged="Changed"/>
+                    <TextBlock Grid.Row="2" Text="桁数 / 開始番号:" Margin="0,0,8,0"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                        <TextBox x:Name="NameDigitsBox" Width="50" Text="3" TextAlignment="Right" TextChanged="Changed"/>
+                        <TextBlock Text=" 桁　開始 " Margin="4,0"/>
+                        <TextBox x:Name="NameStartBox" Width="70" Text="1" TextAlignment="Right" TextChanged="Changed"/>
+                        <TextBlock Text="　増分 " Margin="4,0"/>
+                        <TextBox x:Name="NameStepBox" Width="50" Text="1" TextAlignment="Right" TextChanged="Changed"/>
+                    </StackPanel>
+                    <TextBlock Grid.Row="3" Text="数字の位置:" Margin="0,0,8,0"/>
+                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                        <RadioButton x:Name="PosHead" Content="先頭に付加" Checked="Changed"/>
+                        <RadioButton x:Name="PosTail" Content="末尾に付加" IsChecked="True" Checked="Changed"/>
+                        <RadioButton x:Name="PosBoth" Content="両方" Checked="Changed"/>
+                    </StackPanel>
+                    <TextBlock Grid.Row="4" Text="区切り文字:" Margin="0,0,8,0"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="SepBox" Width="80" HorizontalAlignment="Left" Text="_" TextChanged="Changed"/>
+                </Grid>
+            </GroupBox>
+
+            <StackPanel Grid.Column="2">
+                <GroupBox>
+                    <GroupBox.Header><CheckBox x:Name="ExtCheck" Content="拡張子の変更" Checked="Changed" Unchecked="Changed" Margin="0"/></GroupBox.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="固定文字列:" Margin="0,0,8,0"/>
+                        <TextBox Grid.Column="1" x:Name="ExtFixedBox" TextChanged="Changed"/>
+                        <TextBlock Grid.Row="1" Text="桁数 / 開始番号:" Margin="0,0,8,0"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                            <TextBox x:Name="ExtDigitsBox" Width="50" Text="0" TextAlignment="Right" TextChanged="Changed"/>
+                            <TextBlock Text=" 桁（0 で番号なし）　開始 " Margin="4,0"/>
+                            <TextBox x:Name="ExtStartBox" Width="70" Text="1" TextAlignment="Right" TextChanged="Changed"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="オプション">
+                    <StackPanel>
+                        <CheckBox x:Name="ConsiderCheck" Content="既存ファイル名を考慮（衝突する名前は一時名を経由して付け替える）" IsChecked="True"/>
+                        <TextBlock Foreground="{DynamicResource OtherDimBrush}" TextWrapping="Wrap" Text="対象の並び順は、いまの一覧の表示順（ソート順）です。"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+
+        <GroupBox Header="変換結果のプレビュー">
+            <ListView x:Name="Preview" Background="#40000000" BorderThickness="0" Foreground="{DynamicResource OtherFgBrush}">
+                <ListView.Resources>
+                    <Style TargetType="GridViewColumnHeader">
+                        <Setter Property="Background" Value="{DynamicResource InfoBgBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource InfoTitleBrush}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource FrameBrush}"/>
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                        <Setter Property="Padding" Value="6,2"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+                    </Style>
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="現在の名前" Width="380" DisplayMemberBinding="{Binding OldName}"/>
+                        <GridViewColumn Header="→" Width="30"/>
+                        <GridViewColumn Header="新しい名前" Width="380" DisplayMemberBinding="{Binding NewName}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+    </DockPanel>
+</Window>
