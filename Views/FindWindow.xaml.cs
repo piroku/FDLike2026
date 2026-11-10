@@ -188,45 +188,68 @@ public partial class FindWindow : Window
         try { Clipboard.SetText(string.Join(Environment.NewLine, rows.Select(r => r.FullPath)) + Environment.NewLine); } catch { }
     }
 
-    // ---- 右クリック: Windows のメニュー ----
-    /// <summary>結果の行を右クリック: エクスプローラーと同じ Windows のメニューを出す（複数選択していればその分が対象）。</summary>
+    // ---- 右クリック: Windows のメニュー / 削除 ----
+    /// <summary>結果の行を右クリック: 選択行が 1 つのフォルダ内ならエクスプローラーと同じ Windows のメニュー、複数フォルダにまたがっていれば削除などの簡易メニューを出す。</summary>
     private void Results_RightButtonUp(object sender, MouseButtonEventArgs e)
     {
         if (e.OriginalSource is not DependencyObject src) return;
         if (ItemsControl.ContainerFromElement(Results, src) is not ListViewItem { DataContext: FoundItem f }) return;   // 見出し・余白
         e.Handled = true;
         if (!Results.SelectedItems.Contains(f)) Results.SelectedItem = f;
-        var mp = System.Windows.Forms.Cursor.Position;
-        ShowShellMenu(f, mp.X, mp.Y);
+        ShowRowMenu(f, null);
     }
 
     /// <summary>アプリケーションキー / Shift+F10: 選択行の左下にメニューを出す。</summary>
-    private void ShowShellMenuAtSelection()
+    private void ShowMenuAtSelection()
     {
         if (Results.SelectedItem is not FoundItem f) return;
-        int x, y;
-        if (Results.ItemContainerGenerator.ContainerFromItem(f) is FrameworkElement row && row.IsVisible)
-        {
-            var pt = row.PointToScreen(new Point(0, row.ActualHeight));
-            x = (int)pt.X; y = (int)pt.Y;
-        }
-        else { var mp = System.Windows.Forms.Cursor.Position; x = mp.X; y = mp.Y; }
-        ShowShellMenu(f, x, y);
+        ShowRowMenu(f, Results.ItemContainerGenerator.ContainerFromItem(f) is FrameworkElement { IsVisible: true } row ? row : null);
     }
 
-    private void ShowShellMenu(FoundItem anchor, int x, int y)
+    /// <summary>row が null ならマウス位置、あればその行の左下に出す。</summary>
+    private void ShowRowMenu(FoundItem anchor, FrameworkElement? row)
     {
-        // Windows のメニューは 1 つのフォルダ内の項目にしか出せないので、別フォルダの行は選択から外す（対象が見た目どおりになるように）
         var selected = Results.SelectedItems.Cast<FoundItem>().ToList();
-        var targets = selected.Where(r => string.Equals(r.Folder, anchor.Folder, StringComparison.OrdinalIgnoreCase)).ToList();
-        if (targets.Count == 0) targets.Add(anchor);
-        if (targets.Count != selected.Count)
+        if (selected.Count == 0) return;
+        bool oneFolder = selected.All(r => string.Equals(r.Folder, anchor.Folder, StringComparison.OrdinalIgnoreCase));
+        if (oneFolder) { ShowShellMenu(anchor, row); return; }
+
+        // Windows のメニューは 1 つのフォルダ内の項目にしか出せない。複数フォルダにまたがる選択には自前のメニューを出す
+        int same = selected.Count(r => string.Equals(r.Folder, anchor.Folder, StringComparison.OrdinalIgnoreCase));
+        var menu = new ContextMenu();
+        void Add(string header, Action act)
+        {
+            var mi = new MenuItem { Header = header };
+            mi.Click += (_, _) => act();
+            menu.Items.Add(mi);
+        }
+        menu.Items.Add(new MenuItem { Header = $"選択した {selected.Count:#,0} 件（複数のフォルダ）", IsEnabled = false });
+        menu.Items.Add(new Separator());
+        Add("削除（ごみ箱）(_D)　　Delete", () => DeleteSelected(permanent: false));
+        Add("完全に削除　　Shift+Delete", () => DeleteSelected(permanent: true));
+        Add("パスをコピー(_P)　　Ctrl+C", () => Copy_Click(this, new RoutedEventArgs()));
+        menu.Items.Add(new Separator());
+        Add($"Windows のメニュー（この行と同じフォルダの {same:#,0} 件だけ）(_W)...", () =>
         {
             Results.SelectedItems.Clear();
-            foreach (var r in targets) Results.SelectedItems.Add(r);
-            ScanText.Text = "（Windows のメニューは同じフォルダ内の行が対象です。別フォルダの行は選択から外しました）";
-        }
+            foreach (var r in selected.Where(r => string.Equals(r.Folder, anchor.Folder, StringComparison.OrdinalIgnoreCase))) Results.SelectedItems.Add(r);
+            ShowShellMenu(anchor, row);
+        });
+        if (row is not null) { menu.PlacementTarget = row; menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom; }
+        else menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+        menu.IsOpen = true;
+    }
+
+    /// <summary>選択行（すべて anchor と同じフォルダ）の Windows のメニューを出す。</summary>
+    private void ShowShellMenu(FoundItem anchor, FrameworkElement? row)
+    {
+        int x, y;
+        if (row is not null) { var pt = row.PointToScreen(new Point(0, row.ActualHeight)); x = (int)pt.X; y = (int)pt.Y; }
+        else { var mp = System.Windows.Forms.Cursor.Position; x = mp.X; y = mp.Y; }
+        var targets = Results.SelectedItems.Cast<FoundItem>().ToList();
+        if (targets.Count == 0) targets.Add(anchor);
         var paths = targets.Select(r => r.FullPath).ToList();
+        // WPF のメニューが完全に閉じてから Win32 のメニューを出す
         Dispatcher.BeginInvoke(() =>
         {
             try { ShellContextMenu.Show(this, anchor.Folder, paths, x, y); }
@@ -236,11 +259,47 @@ public partial class FindWindow : Window
                 MessageBox.Show(this, "Windows のメニューを表示できませんでした:\n" + ex.Message, "ファイルの検索", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // メニューから削除・移動された行は一覧から消す
-            foreach (var r in targets)
-                if (r.IsDirectory ? !Directory.Exists(r.FullPath) : !File.Exists(r.FullPath)) _results.Remove(r);
-            CountText.Text = $"{_results.Count:#,0} 件";
+            RemoveMissing(targets);
         }, System.Windows.Threading.DispatcherPriority.Background);
+    }
+
+    /// <summary>Delete / Shift+Delete / メニューの削除: 選択行をまとめて削除する（別々のフォルダにあってもよい）。</summary>
+    private void DeleteSelected(bool permanent)
+    {
+        var rows = Results.SelectedItems.Cast<FoundItem>().ToList();
+        if (rows.Count == 0) return;
+        bool recycle = !permanent && _settings.DeleteToRecycleBin;
+        bool noBin = recycle && rows.Any(r => !FileOperations.HasRecycleBin(r.FullPath));
+        var how = !recycle ? "完全に削除" : noBin ? "完全に削除（ネットワーク上のためごみ箱には入りません）" : "ごみ箱へ移動";
+        var what = rows.Count == 1 ? rows[0].FullPath : $"選択した {rows.Count:#,0} 件";
+        var icon = recycle && !noBin ? MessageBoxImage.Question : MessageBoxImage.Warning;
+        if (MessageBox.Show(this, $"{what} を{how}しますか？", "ファイルの検索", MessageBoxButton.YesNo, icon, MessageBoxResult.No) != MessageBoxResult.Yes) return;
+        try
+        {
+            // 1 件ずつ。先に親フォルダごと消えた行は FromPaths が空を返すので飛ばされる
+            foreach (var r in rows) FileOperations.Delete(FileOperations.FromPaths(new[] { r.FullPath }), recycle);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            App.Log(ex);
+            MessageBox.Show(this, "削除できませんでした:\n" + ex.Message, "ファイルの検索", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        RemoveMissing(rows);
+    }
+
+    /// <summary>削除・移動されて無くなった行を一覧から消す。</summary>
+    private void RemoveMissing(List<FoundItem> rows)
+    {
+        int index = Results.SelectedIndex;
+        foreach (var r in rows)
+            if (r.IsDirectory ? !Directory.Exists(r.FullPath) : !File.Exists(r.FullPath)) _results.Remove(r);
+        CountText.Text = $"{_results.Count:#,0} 件";
+        if (Results.SelectedItem is null && _results.Count > 0)
+        {
+            Results.SelectedIndex = Math.Clamp(index, 0, _results.Count - 1);
+            (Results.ItemContainerGenerator.ContainerFromIndex(Results.SelectedIndex) as UIElement)?.Focus();
+        }
     }
 
     private void Close_Click(object sender, RoutedEventArgs e) { _cts?.Cancel(); Close(); }
@@ -263,7 +322,11 @@ public partial class FindWindow : Window
         }
         else if (Results.IsKeyboardFocusWithin && (e.Key == Key.Apps || (Keyboard.Modifiers == ModifierKeys.Shift && (e.Key == Key.F10 || (e.Key == Key.System && e.SystemKey == Key.F10)))))
         {
-            ShowShellMenuAtSelection(); e.Handled = true;
+            ShowMenuAtSelection(); e.Handled = true;
+        }
+        else if (e.Key == Key.Delete && Results.IsKeyboardFocusWithin && Results.SelectedItem is not null && Keyboard.Modifiers is ModifierKeys.None or ModifierKeys.Shift)
+        {
+            DeleteSelected(permanent: Keyboard.Modifiers == ModifierKeys.Shift); e.Handled = true;
         }
     }
 
