@@ -87,10 +87,10 @@
 
         <!-- 結果 -->
         <DockPanel Grid.Row="5">
-            <TextBlock DockPanel.Dock="Top" Text="見つかったファイル(F):　　Enter/M: そのファイルへ移動　Ctrl+C: 一覧をコピー　右クリック: メニュー　Delete: 削除" Margin="0,0,0,4"/>
+            <TextBlock DockPanel.Dock="Top" Text="見つかったファイル(F):　　Enter/M: そのファイルへ移動　Ctrl+C: 一覧をコピー　右クリック: メニュー" Margin="0,0,0,4"/>
             <ListView x:Name="Results" Background="#40000000" BorderBrush="{DynamicResource FrameBrush}"
                       Foreground="{DynamicResource OtherFgBrush}"
-                      MouseDoubleClick="Results_DoubleClick" PreviewMouseRightButtonUp="Results_RightButtonUp" SelectionChanged="Results_SelectionChanged"
+                      MouseDoubleClick="Results_DoubleClick" PreviewMouseRightButtonDown="Results_RightButtonDown" PreviewMouseRightButtonUp="Results_RightButtonUp" SelectionChanged="Results_SelectionChanged"
                       ItemContainerStyle="{StaticResource FdListViewItem}"
                       VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Standard">
                 <ListView.Resources>

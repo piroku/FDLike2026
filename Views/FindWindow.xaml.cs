@@ -190,6 +190,14 @@ public partial class FindWindow : Window
 
     // ---- 右クリック: Windows のメニュー / 削除 ----
     /// <summary>結果の行を右クリック: 選択行が 1 つのフォルダ内ならエクスプローラーと同じ Windows のメニュー、複数フォルダにまたがっていれば削除などの簡易メニューを出す。</summary>
+    /// <summary>選択済みの行を右クリックしたときは、複数選択を保つ（既定の動作に任せると、その 1 行だけの選択になってしまう）。</summary>
+    private void Results_RightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject src) return;
+        if (ItemsControl.ContainerFromElement(Results, src) is not ListViewItem { DataContext: FoundItem f } row) return;
+        if (Results.SelectedItems.Count > 1 && Results.SelectedItems.Contains(f)) { row.Focus(); e.Handled = true; }
+    }
+
     private void Results_RightButtonUp(object sender, MouseButtonEventArgs e)
     {
         if (e.OriginalSource is not DependencyObject src) return;
@@ -225,8 +233,8 @@ public partial class FindWindow : Window
         }
         menu.Items.Add(new MenuItem { Header = $"選択した {selected.Count:#,0} 件（複数のフォルダ）", IsEnabled = false });
         menu.Items.Add(new Separator());
-        Add("削除（ごみ箱）(_D)　　Delete", () => DeleteSelected(permanent: false));
-        Add("完全に削除　　Shift+Delete", () => DeleteSelected(permanent: true));
+        Add("削除（ごみ箱）(_D)", () => DeleteSelected(permanent: false));
+        Add("完全に削除(_K)", () => DeleteSelected(permanent: true));
         Add("パスをコピー(_P)　　Ctrl+C", () => Copy_Click(this, new RoutedEventArgs()));
         menu.Items.Add(new Separator());
         Add($"Windows のメニュー（この行と同じフォルダの {same:#,0} 件だけ）(_W)...", () =>
@@ -263,7 +271,7 @@ public partial class FindWindow : Window
         }, System.Windows.Threading.DispatcherPriority.Background);
     }
 
-    /// <summary>Delete / Shift+Delete / メニューの削除: 選択行をまとめて削除する（別々のフォルダにあってもよい）。</summary>
+    /// <summary>メニューの削除: 選択行をまとめて削除する（別々のフォルダにあってもよい）。</summary>
     private void DeleteSelected(bool permanent)
     {
         var rows = Results.SelectedItems.Cast<FoundItem>().ToList();
@@ -323,10 +331,6 @@ public partial class FindWindow : Window
         else if (Results.IsKeyboardFocusWithin && (e.Key == Key.Apps || (Keyboard.Modifiers == ModifierKeys.Shift && (e.Key == Key.F10 || (e.Key == Key.System && e.SystemKey == Key.F10)))))
         {
             ShowMenuAtSelection(); e.Handled = true;
-        }
-        else if (e.Key == Key.Delete && Results.IsKeyboardFocusWithin && Results.SelectedItem is not null && Keyboard.Modifiers is ModifierKeys.None or ModifierKeys.Shift)
-        {
-            DeleteSelected(permanent: Keyboard.Modifiers == ModifierKeys.Shift); e.Handled = true;
         }
     }
 
