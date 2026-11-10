@@ -188,6 +188,61 @@ public partial class FindWindow : Window
         try { Clipboard.SetText(string.Join(Environment.NewLine, rows.Select(r => r.FullPath)) + Environment.NewLine); } catch { }
     }
 
+    // ---- 右クリック: Windows のメニュー ----
+    /// <summary>結果の行を右クリック: エクスプローラーと同じ Windows のメニューを出す（複数選択していればその分が対象）。</summary>
+    private void Results_RightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject src) return;
+        if (ItemsControl.ContainerFromElement(Results, src) is not ListViewItem { DataContext: FoundItem f }) return;   // 見出し・余白
+        e.Handled = true;
+        if (!Results.SelectedItems.Contains(f)) Results.SelectedItem = f;
+        var mp = System.Windows.Forms.Cursor.Position;
+        ShowShellMenu(f, mp.X, mp.Y);
+    }
+
+    /// <summary>アプリケーションキー / Shift+F10: 選択行の左下にメニューを出す。</summary>
+    private void ShowShellMenuAtSelection()
+    {
+        if (Results.SelectedItem is not FoundItem f) return;
+        int x, y;
+        if (Results.ItemContainerGenerator.ContainerFromItem(f) is FrameworkElement row && row.IsVisible)
+        {
+            var pt = row.PointToScreen(new Point(0, row.ActualHeight));
+            x = (int)pt.X; y = (int)pt.Y;
+        }
+        else { var mp = System.Windows.Forms.Cursor.Position; x = mp.X; y = mp.Y; }
+        ShowShellMenu(f, x, y);
+    }
+
+    private void ShowShellMenu(FoundItem anchor, int x, int y)
+    {
+        // Windows のメニューは 1 つのフォルダ内の項目にしか出せないので、別フォルダの行は選択から外す（対象が見た目どおりになるように）
+        var selected = Results.SelectedItems.Cast<FoundItem>().ToList();
+        var targets = selected.Where(r => string.Equals(r.Folder, anchor.Folder, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (targets.Count == 0) targets.Add(anchor);
+        if (targets.Count != selected.Count)
+        {
+            Results.SelectedItems.Clear();
+            foreach (var r in targets) Results.SelectedItems.Add(r);
+            ScanText.Text = "（Windows のメニューは同じフォルダ内の行が対象です。別フォルダの行は選択から外しました）";
+        }
+        var paths = targets.Select(r => r.FullPath).ToList();
+        Dispatcher.BeginInvoke(() =>
+        {
+            try { ShellContextMenu.Show(this, anchor.Folder, paths, x, y); }
+            catch (Exception ex)
+            {
+                App.Log(ex);
+                MessageBox.Show(this, "Windows のメニューを表示できませんでした:\n" + ex.Message, "ファイルの検索", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            // メニューから削除・移動された行は一覧から消す
+            foreach (var r in targets)
+                if (r.IsDirectory ? !Directory.Exists(r.FullPath) : !File.Exists(r.FullPath)) _results.Remove(r);
+            CountText.Text = $"{_results.Count:#,0} 件";
+        }, System.Windows.Threading.DispatcherPriority.Background);
+    }
+
     private void Close_Click(object sender, RoutedEventArgs e) { _cts?.Cancel(); Close(); }
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -205,6 +260,10 @@ public partial class FindWindow : Window
         else if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Control && Results.IsKeyboardFocusWithin)
         {
             Copy_Click(sender, e); e.Handled = true;
+        }
+        else if (Results.IsKeyboardFocusWithin && (e.Key == Key.Apps || (Keyboard.Modifiers == ModifierKeys.Shift && (e.Key == Key.F10 || (e.Key == Key.System && e.SystemKey == Key.F10)))))
+        {
+            ShowShellMenuAtSelection(); e.Handled = true;
         }
     }
 

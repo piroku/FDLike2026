@@ -87,7 +87,7 @@ public partial class HelpWindow : Window
             new HelpRow("Z", "エクスプローラーで表示"),
             new HelpRow("B", "カレントフォルダで PowerShell を開く"),
             new HelpRow("F3", "DOS シェル（Windows Terminal → cmd）"),
-            new HelpRow("F", "ファイルの検索（名前のワイルドカード、サブフォルダ、結果から移動。Ctrl+C / コピー(P) で見つかったパスの一覧をクリップボードへ）"),
+            new HelpRow("F", "ファイルの検索（名前のワイルドカード、サブフォルダ、結果から移動。Ctrl+C / コピー(P) で見つかったパスの一覧をクリップボードへ。一覧の右クリック / アプリケーションキーで Windows のメニュー）"),
             new HelpRow("Shift+W", "比較（WinMerge など。タグ 2 件ならその 2 つ、カーソルがファイルなら反対ペインの同名ファイル、フォルダなら左右のフォルダを比較。ツールは 設定 → 操作）"),
             new HelpRow("Shift+F", "文字列の検索 (grep)（ファイルの中身を検索。正規表現 / 大文字小文字 / 単語単位、対象ファイルのマスク。結果から Enter 移動・V ビューアで該当行へ（検索語をハイライト、n / Shift+N で次 / 前）・E エディタで該当行へ（F10 › 操作 の「行指定の引数」）・T ヒットした全ファイルにタグ・Ctrl+C / コピー(P) で結果一覧をテキスト（パス｜行｜内容）としてクリップボードへ。「Office / PDF の中身も」を ON にすると Word / Excel / PowerPoint / PDF の文字も検索（docx/xlsx/pptx と PDF は内蔵、doc/xls/ppt などの旧形式は Office が入っていれば IFilter 経由）。ヒットの行番号は取り出したテキストの行で、V で同じテキストを表示、E は Word 等の既定アプリで開く）"),
             new HelpRow("Shift+D", "隠し / システム属性の表示切替"),
