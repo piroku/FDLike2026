@@ -62,11 +62,46 @@ public partial class App : Application
             _inHandler = true;
             try
             {
-                MessageBox.Show(args.Exception.Message + "\n\n詳細: " + LogPath, "FDLike2026 - エラー",
+                MessageBox.Show((RuntimeUpdatedMessage(args.Exception) ?? args.Exception.Message) + "\n\n詳細: " + LogPath, "FDLike2026 - エラー",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally { _inHandler = false; }
         };
+    }
+
+    /// <summary>
+    /// FDLike2026 を起動したまま Windows Update などで .NET ランタイムが更新されると、実行中の版のフォルダが削除され、
+    /// まだ読み込んでいなかった DLL（右クリックメニューの Accessibility、ごみ箱の Microsoft.VisualBasic.Core など）が
+    /// 「ファイルが見つかりません」になる。その場合に出す案内文を返す（該当しなければ null）。
+    /// 判定: 読めなかったのがアセンブリで、実行中のランタイムのフォルダには無く、別の版のフォルダにはある。
+    /// </summary>
+    public static string? RuntimeUpdatedMessage(Exception? ex)
+    {
+        try
+        {
+            for (int depth = 0; ex is not null && depth < 8; ex = ex.InnerException, depth++)
+            {
+                string? name = ex switch { FileNotFoundException f => f.FileName, FileLoadException l => l.FileName, _ => null };
+                if (string.IsNullOrEmpty(name)) continue;
+                int comma = name.IndexOf(',');
+                if (comma <= 0) continue;   // 「名前, Version=...」の形でなければ普通のファイル
+                string dll = name[..comma].Trim() + ".dll";
+                // .NET 本体（Microsoft.NETCore.App\<版>）と WPF（Microsoft.WindowsDesktop.App\<版>）のフォルダ
+                foreach (var dir in new[] { Path.GetDirectoryName(typeof(object).Assembly.Location), Path.GetDirectoryName(typeof(Window).Assembly.Location) })
+                {
+                    if (string.IsNullOrEmpty(dir) || File.Exists(Path.Combine(dir, dll))) continue;
+                    var parent = Path.GetDirectoryName(dir);
+                    if (parent is null || !Directory.Exists(parent)) continue;
+                    foreach (var other in Directory.GetDirectories(parent))
+                    {
+                        if (!string.Equals(other, dir, StringComparison.OrdinalIgnoreCase) && File.Exists(Path.Combine(other, dll)))
+                            return ".NET が更新されたため、この操作に必要な部品を読み込めません。\nFDLike2026 を終了して、起動し直してください。";
+                    }
+                }
+            }
+        }
+        catch { }
+        return null;
     }
 
     public static void Log(Exception ex)

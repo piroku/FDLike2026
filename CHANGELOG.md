@@ -12,6 +12,7 @@ FDLike2026 の変更履歴です。v0.2.3 が GitHub での最初の公開版で
 ### 修正
 
 - Ctrl+C / Ctrl+X（コピー / 切り取り）や Ctrl+B / Ctrl+Shift+B（パス / ファイル名のコピー）で、たまに「OpenClipboard に失敗しました (CLIPBRD_E_CANT_OPEN)」のエラーが出ていたのを修正。クリップボード履歴やリモートデスクトップなど、クリップボードを見ている他のアプリと処理がぶつかっても、エラーにせず少し待ってやり直す。
+- FDLike2026 を起動したまま Windows Update などで .NET が更新されると、右クリックメニューや削除で「ファイルが見つかりません（Accessibility / Microsoft.VisualBasic.Core）」という分かりにくいエラーになっていた。「.NET が更新されたため、FDLike2026 を起動し直してください」と案内するようにした。
 
 ## v0.2.3（2026-10-30）
 

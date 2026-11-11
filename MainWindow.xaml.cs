@@ -1421,9 +1421,11 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            _vm.Message = $"{what}: エラー - {ex.Message}";
+            // 起動中に .NET が更新された場合は、分かりにくい「ファイルが見つかりません」の代わりに再起動を案内する
+            var msg = App.RuntimeUpdatedMessage(ex) ?? ex.Message;
+            _vm.Message = $"{what}: エラー - {msg.Replace("\n", " ")}";
             App.Log(ex);   // スタックトレースを error.log に残す
-            MessageBox.Show(this, ex.Message, $"FDLike2026 - {what}", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(this, msg, $"FDLike2026 - {what}", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
