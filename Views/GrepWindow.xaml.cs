@@ -313,7 +313,7 @@ public partial class GrepWindow : Window
         if (rows.Count == 0) return;
         var sb = new System.Text.StringBuilder();
         foreach (var h in rows) sb.Append(h.FullPath).Append('\t').Append(h.Line).Append('\t').Append(h.LineText.Replace('\t', ' ')).Append(Environment.NewLine);
-        try { Clipboard.SetText(sb.ToString()); ScanText.Text = $"（{rows.Count} 行をクリップボードへコピーしました）"; } catch { }
+        try { FileOperations.SetClipboardText(sb.ToString()); ScanText.Text = $"（{rows.Count} 行をクリップボードへコピーしました）"; } catch { }
     }
 
     private void Close_Click(object sender, RoutedEventArgs e) { _cts?.Cancel(); Close(); }

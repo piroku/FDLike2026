@@ -185,7 +185,7 @@ public partial class FindWindow : Window
     {
         var rows = Results.SelectedItems.Count > 1 ? Results.SelectedItems.Cast<FoundItem>().ToList() : _results.ToList();
         if (rows.Count == 0) return;
-        try { Clipboard.SetText(string.Join(Environment.NewLine, rows.Select(r => r.FullPath)) + Environment.NewLine); } catch { }
+        try { FileOperations.SetClipboardText(string.Join(Environment.NewLine, rows.Select(r => r.FullPath)) + Environment.NewLine); } catch { }
     }
 
     // ---- 右クリック: Windows のメニュー / 削除 ----

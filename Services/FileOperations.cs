@@ -155,8 +155,54 @@ public static class FileOperations
         // WinFM2008 と同じく、テキストとしても入れておく（秀丸やメモ帳に貼るとファイル名の一覧になる。1 行 1 件）
         var names = string.Join(Environment.NewLine, items.Select(i => i.Name));
         if (names.Length > 0) data.SetText(names, System.Windows.TextDataFormat.UnicodeText);
-        System.Windows.Clipboard.SetDataObject(data, true);
+        SetClipboard(data);
     }
+
+    /// <summary>文字列をクリップボードへ置く（Clipboard.SetText の代わり）。</summary>
+    public static void SetClipboardText(string text)
+    {
+        var data = new System.Windows.DataObject();
+        data.SetText(text);
+        SetClipboard(data);
+    }
+
+    /// <summary>
+    /// クリップボードへ置く。Clipboard.SetDataObject(data, true) は「置く」→「確定（Flush）」を続けて行うが、
+    /// 置いた直後はクリップボードを監視しているアプリ（クリップボード履歴、リモートデスクトップなど）が中身を読みに来るため、
+    /// 確定がぶつかって CLIPBRD_E_CANT_OPEN (0x800401D0) になることがある。
+    /// 置くところまでを同期で行い、確定は少し後に画面を止めずに行う（失敗しても貼り付けはできるので、記録だけ残す）。
+    /// </summary>
+    public static void SetClipboard(System.Windows.IDataObject data)
+    {
+        System.Windows.Clipboard.SetDataObject(data, false);
+        int seq = ++_clipSeq, tries = 0;
+        var timer = new System.Windows.Threading.DispatcherTimer(System.Windows.Threading.DispatcherPriority.Background)
+        {
+            Interval = TimeSpan.FromMilliseconds(150)
+        };
+        timer.Tick += (_, _) =>
+        {
+            try
+            {
+                // 新しいコピーが行われた / 他のアプリがクリップボードを書き換えた → 何もしない
+                if (seq != _clipSeq || !System.Windows.Clipboard.IsCurrent(data)) { timer.Stop(); return; }
+                int hr = OleFlushClipboard();
+                if (hr >= 0) { timer.Stop(); return; }
+                if (++tries >= 30)   // 約 4.5 秒あきらめずに試す
+                {
+                    timer.Stop();
+                    App.Log(new COMException("クリップボードの確定（OleFlushClipboard）に失敗しました。コピー自体はできています。", hr));
+                }
+            }
+            catch (Exception ex) { timer.Stop(); App.Log(ex); }
+        };
+        timer.Start();
+    }
+
+    private static int _clipSeq;
+
+    [DllImport("ole32.dll")]
+    private static extern int OleFlushClipboard();
 
     /// <summary>クリップボードのファイルを destDir へ貼り付け。切り取りなら移動。戻り値は処理件数。</summary>
     /// <summary>
@@ -204,7 +250,8 @@ public static class FileOperations
             if (items.Count == 0) return 0;
         }
         if (move) Move(items, destDir, renames); else Copy(items, destDir, renames);
-        if (move) System.Windows.Clipboard.Clear();
+        // 移動は済んでいるので、クリップボードを空にできなくてもエラーにはしない
+        if (move) { try { System.Windows.Clipboard.Clear(); } catch (COMException ex) { App.Log(ex); } }
         return items.Count;
     }
 

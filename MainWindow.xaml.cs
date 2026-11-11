@@ -1374,7 +1374,7 @@ public partial class MainWindow : Window
     {
         var items = _vm.Active.TargetEntries();
         if (items.Count == 0) return;
-        Clipboard.SetText(string.Join(Environment.NewLine, items.Select(i => i.Name)));
+        FileOperations.SetClipboardText(string.Join(Environment.NewLine, items.Select(i => i.Name)));
         _vm.Message = items.Count == 1 ? $"ファイル名をコピーしました: {items[0].Name}" : $"{items.Count} 件のファイル名をコピーしました";
     }
 
@@ -1382,7 +1382,7 @@ public partial class MainWindow : Window
     {
         var items = _vm.Active.TargetEntries();
         if (items.Count == 0) return;
-        Clipboard.SetText(string.Join(Environment.NewLine, items.Select(i => i.FullPath)));
+        FileOperations.SetClipboardText(string.Join(Environment.NewLine, items.Select(i => i.FullPath)));
         _vm.Message = $"{items.Count} 件のパスをクリップボードへコピーしました";
     }
 
