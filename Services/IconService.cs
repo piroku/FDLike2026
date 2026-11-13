@@ -52,7 +52,7 @@ public static class IconService
     private const uint SIID_DRIVENET = 9;
     public const uint SIID_SERVER = 15;        // コンピューター
     public const uint SIID_MYNETWORK = 17;     // ネットワーク
-    public const uint SIID_SERVERSHARE = 27;   // 共有フォルダ
+    public const uint SIID_SERVERSHARE = 51;   // 共有フォルダ
 
     private static readonly ConcurrentDictionary<string, ImageSource?> Cache = new(StringComparer.OrdinalIgnoreCase);
     private static ImageSource? _folder;
