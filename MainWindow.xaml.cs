@@ -161,7 +161,7 @@ public partial class MainWindow : Window
     private void Tree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
         if (_syncingTree || _treeMode) return;   // ツリーモード中は Enter で確定するまで一覧を変えない
-        if (e.NewValue is TreeNode n && PathProbe.DirectoryExists(n.Path) &&
+        if (e.NewValue is TreeNode n && n.IsFileSystem && PathProbe.DirectoryExists(n.Path) &&
             !string.Equals(n.Path.TrimEnd('\\'), _vm.Active.Path.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
         {
             _vm.Active.Load(n.Path);
@@ -181,7 +181,7 @@ public partial class MainWindow : Window
         _vm.Left.IsActive = _vm.Right.IsActive = false;
         SyncTree();
         if (TreeCursor() is null && _vm.TreeRoots.Count > 0) SelectTreeNode(_vm.TreeRoots[0]);
-        _vm.Message = "ツリー: ↑↓ 移動  → 開く  ← 閉じる  Space 開閉  Enter 決定  L 装置  K フォルダ作成  Shift+文字 頭文字ジャンプ  Esc 戻る";
+        _vm.Message = "ツリー: ↑↓ 移動  → 開く  ← 閉じる  Space 開閉  Enter 決定  L 装置  K フォルダ作成  Shift+文字 頭文字ジャンプ  F5 再読込  Esc 戻る";
     }
 
     private void ExitTreeMode(bool load)
@@ -190,7 +190,7 @@ public partial class MainWindow : Window
         TreeFrame.SetResourceReference(Border.BorderBrushProperty, "FrameBrush");
         _vm.Left.IsActive = _vm.Active == _vm.Left;
         _vm.Right.IsActive = _vm.Active == _vm.Right;
-        if (load && TreeCursor() is { } n && PathProbe.DirectoryExists(n.Path)) { _vm.Active.Load(n.Path); }
+        if (load && TreeCursor() is { IsFileSystem: true } n && PathProbe.DirectoryExists(n.Path)) { _vm.Active.Load(n.Path); }
         _vm.Message = "";
         Focus();
     }
@@ -270,9 +270,16 @@ public partial class MainWindow : Window
         switch (key)
         {
             case Key.Escape: ExitTreeMode(load: false); return true;
-            case Key.F5: foreach (var r in _vm.TreeRoots) r.Refresh(); _vm.ReloadBoth(); return true;   // ツリーも一覧も再読込
+            case Key.F5:   // ツリーも一覧も再読込。「ネットワーク」/ コンピューターの上なら、その下を探し直す
+                foreach (var r in _vm.TreeRoots) r.Refresh();
+                if (cur is { IsFileSystem: false }) { PathProbe.Reset(); cur.Discover(); }
+                _vm.ReloadBoth();
+                return true;
             case Key.Enter when shift: if (cur is not null) cur.IsExpanded = !cur.IsExpanded; return true;
-            case Key.Enter: ExitTreeMode(load: true); return true;
+            case Key.Enter:
+                // 「ネットワーク」とコンピューターは一覧に表示できないので、開くだけ（ツリーに留まる）
+                if (cur is { IsFileSystem: false }) { cur.IsExpanded = true; return true; }
+                ExitTreeMode(load: true); return true;
             case Key.Space: if (cur is not null) cur.IsExpanded = !cur.IsExpanded; return true;
             case Key.Up: TreeMoveCursor(-1); return true;
             case Key.Down: TreeMoveCursor(1); return true;
@@ -291,7 +298,7 @@ public partial class MainWindow : Window
             case Key.F6: ExitTreeMode(load: false); _vm.ToggleTree(); ApplyTreeColumn(); return true;
             case Key.L: CmdDrive(); return true;
             case Key.K:
-                if (cur is not null)
+                if (cur is { IsFileSystem: true })
                 {
                     var name = InputDialog.Show(this, $"{cur.Name} の下に作成するフォルダ名");
                     if (!string.IsNullOrWhiteSpace(name))
@@ -555,7 +562,7 @@ public partial class MainWindow : Window
 
     private void Tree_DragOver(object sender, DragEventArgs e)
     {
-        e.Effects = TreeNodeAt(e) is null ? DragDropEffects.None : EffectFor(e);
+        e.Effects = TreeNodeAt(e) is { IsFileSystem: true } ? EffectFor(e) : DragDropEffects.None;
         e.Handled = true;
     }
 
@@ -563,7 +570,7 @@ public partial class MainWindow : Window
     {
         var node = TreeNodeAt(e);
         var effect = EffectFor(e);
-        if (node is null || effect == DragDropEffects.None) return;
+        if (node is not { IsFileSystem: true } || effect == DragDropEffects.None) return;
         DoDrop(e, node.Path, effect);
         e.Handled = true;
     }
@@ -821,6 +828,7 @@ public partial class MainWindow : Window
         // ツリーのルート（ラベルはバックグラウンドで解決済み）をそのまま使う。
         // 切断されたネットワークドライブで固まらないよう、ここでは IsReady / 空き容量を問い合わせない。
         var choices = _vm.TreeRoots
+            .Where(n => n.Kind == TreeNodeKind.Folder)
             .Select(n => new ListChoice(n.Path.Substring(0, 1), n.Name, n.Path))
             .ToList();
         var cur = Path.GetPathRoot(_vm.Active.Path) ?? "";

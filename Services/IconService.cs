@@ -50,13 +50,23 @@ public static class IconService
     private static extern int SHGetStockIconInfo(uint siid, uint uFlags, ref SHSTOCKICONINFO psii);
 
     private const uint SIID_DRIVENET = 9;
+    public const uint SIID_SERVER = 15;        // コンピューター
+    public const uint SIID_MYNETWORK = 17;     // ネットワーク
+    public const uint SIID_SERVERSHARE = 27;   // 共有フォルダ
 
     private static readonly ConcurrentDictionary<string, ImageSource?> Cache = new(StringComparer.OrdinalIgnoreCase);
     private static ImageSource? _folder;
     private static ImageSource? _netDrive;
+    private static readonly ConcurrentDictionary<uint, ImageSource?> StockCache = new();
+
+    /// <summary>シェルの標準アイコン（ネットワーク / コンピューターなど。ディスクにもネットワークにもアクセスしない）。</summary>
+    public static ImageSource? Stock(uint siid)
+    {
+        try { return StockCache.GetOrAdd(siid, LoadStock); } catch { return null; }
+    }
 
     /// <summary>Ctrl+I でのアイコン表示 ON/OFF（表示側は DynamicResource で切り替え、ここはキャッシュだけ）。</summary>
-    public static void ClearCache() { Cache.Clear(); _folder = null; _netDrive = null; }
+    public static void ClearCache() { Cache.Clear(); StockCache.Clear(); _folder = null; _netDrive = null; }
 
     /// <summary>シェルの標準アイコン（ディスクにアクセスしない）。</summary>
     private static ImageSource? LoadStock(uint siid)

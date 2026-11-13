@@ -6,7 +6,7 @@ using FDLike2026.Services;
 
 namespace FDLike2026.Views;
 
-/// <summary>ジャンプ先 1 件。Key は "F1".."F12" / "A".."Z"。</summary>
+/// <summary>ジャンプ先 1 件。Key は "F1".."F12" / "A".."Z" / "01".."65"。</summary>
 public sealed class JumpSlot : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -22,7 +22,8 @@ public sealed class JumpSlot : INotifyPropertyChanged
 }
 
 /// <summary>
-/// WinFM2008 の JumpFolder 相当。F1～F12 と A～Z の計 38 スロットにパスを登録し、1 キーで移動する。
+/// WinFM2008 の JumpFolder 相当。F1～F12 と A～Z（1 キーで移動）、01～65（数字 2 桁で移動。WinFM2008 と同じ番号）の
+/// 計 103 スロットにパスを登録する。
 /// </summary>
 public partial class JumpWindow : Window
 {
@@ -35,10 +36,14 @@ public partial class JumpWindow : Window
     /// <summary>パス欄にファイルのパスが貼られたとき、移動後にカーソルを合わせるファイル名。</summary>
     public string? SelectName { get; private set; }
 
+    /// <summary>番号のスロット数（WinFM2008 と同じ 01～65）。</summary>
+    public const int NumberCount = 65;
+
     public static IEnumerable<string> AllKeys()
     {
         for (int i = 1; i <= 12; i++) yield return $"F{i}";
         for (char c = 'A'; c <= 'Z'; c++) yield return c.ToString();
+        for (int i = 1; i <= NumberCount; i++) yield return i.ToString("00");
     }
 
     public JumpWindow(Window owner, Settings settings, string currentDir)
@@ -127,6 +132,13 @@ public partial class JumpWindow : Window
         }
 
         e.Handled = true;
+
+        // 数字 2 桁: 01～65 の行へ（登録済みならジャンプ、未登録ならその行を選ぶだけ）
+        int digit = key >= Key.D0 && key <= Key.D9 ? key - Key.D0
+                  : key >= Key.NumPad0 && key <= Key.NumPad9 ? key - Key.NumPad0 : -1;
+        if (digit >= 0 && Keyboard.Modifiers == ModifierKeys.None) { TypeDigit(digit); return; }
+        _firstDigit = -1;
+
         switch (key)
         {
             case Key.Escape: Close(); return;
@@ -160,6 +172,30 @@ public partial class JumpWindow : Window
             return;
         }
         e.Handled = false;
+    }
+
+    private int _firstDigit = -1;
+    private DateTime _firstDigitAt;
+
+    /// <summary>数字キー。1 桁目で十の位の行を選び、2 桁目でその番号の行へ（3 秒あくと 1 桁目からやり直し）。</summary>
+    private void TypeDigit(int digit)
+    {
+        JumpSlot? Number(int n) => n >= 1 && n <= NumberCount ? _slots.First(s => s.Key == n.ToString("00")) : null;
+        void Select(JumpSlot s) { List.SelectedItem = s; List.ScrollIntoView(s); }
+
+        if (_firstDigit >= 0 && (DateTime.Now - _firstDigitAt).TotalSeconds < 3)
+        {
+            var slot = Number(_firstDigit * 10 + digit);
+            _firstDigit = -1;
+            if (slot is null) return;          // 00 や 66 以上
+            Select(slot);
+            if (!string.IsNullOrEmpty(slot.Path)) JumpTo(slot);
+            return;
+        }
+        if (digit * 10 > NumberCount) { _firstDigit = -1; return; }   // 7x 以上は無い
+        _firstDigit = digit;
+        _firstDigitAt = DateTime.Now;
+        if (Number(Math.Max(1, digit * 10)) is { } first) Select(first);   // 目印として 10 / 20 … の行（0 のときは 01）へ
     }
 
     private void Move(int delta)

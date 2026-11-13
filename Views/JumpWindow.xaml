@@ -54,7 +54,7 @@
         </Border>
         <Border DockPanel.Dock="Bottom" Style="{StaticResource Frame}">
             <TextBlock Style="{StaticResource Mono}" Foreground="{DynamicResource DimBrush}" TextWrapping="Wrap"
-                       Text="A～Z / F1～F12 キー: その場所へジャンプ　　クリック: 選択　　ダブルクリック / Enter: 選択行へジャンプ　　右クリック: メニュー　　Space / Ins: 選択行に現在のディレクトリを登録（未登録キーを押しても登録）　　Shift+E: パスを編集　　Del: 登録解除　　上のパス欄: 貼り付けて Enter で 1 回だけ移動　　Esc: 閉じる"/>
+                       Text="A～Z / F1～F12 キー: その場所へジャンプ　　数字 2 桁（01～65）: その番号へジャンプ（未登録なら選択のみ）　　クリック: 選択　　ダブルクリック / Enter: 選択行へジャンプ　　右クリック: メニュー　　Space / Ins: 選択行に現在のディレクトリを登録（未登録の A～Z / F1～F12 を押しても登録）　　Shift+E: パスを編集　　Del: 登録解除　　上のパス欄: 貼り付けて Enter で 1 回だけ移動　　Esc: 閉じる"/>
         </Border>
         <Border Style="{StaticResource Frame}">
             <ListBox x:Name="List" Background="Transparent" BorderThickness="0" Focusable="False" Foreground="{DynamicResource TextBrush}"

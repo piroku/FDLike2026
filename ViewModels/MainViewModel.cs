@@ -57,6 +57,12 @@ public sealed class MainViewModel : ObservableObject
     {
         Settings = Settings.Load();
         _showTree = Settings.ShowTree;
+        // ツリーの「ネットワーク」に、探索を待たずに並べるコンピューター: JumpFolder の登録先・最近開いたフォルダ・左右の現在地
+        TreeNode.KnownHosts = () => Settings.JumpFolders.Values
+            .Concat(PaneViewModel.Recent)
+            .Concat(new[] { Left.Path, Right.Path })
+            .Select(p => NetworkBrowser.HostFromUnc(Environment.ExpandEnvironmentVariables(p ?? "")))
+            .Where(h => h is not null).Select(h => h!);
         TreeRoots = TreeNode.BuildRoots();
 
         Left.ShowHidden = Right.ShowHidden = Settings.ShowHidden;

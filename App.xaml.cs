@@ -28,6 +28,34 @@ public partial class App : Application
             Shutdown();
             return;
         }
+        // 診断用: FDLike2026.exe --netenum <出力txt> [ホスト名]  … ツリーの「ネットワーク」と同じ方法でコンピューター / 共有フォルダを列挙して終了
+        if (e.Args.Length >= 2 && e.Args[0] == "--netenum")
+        {
+            try
+            {
+                var sb = new System.Text.StringBuilder();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                if (e.Args.Length >= 3)
+                {
+                    var shares = Services.NetworkBrowser.EnumShares(e.Args[2]);
+                    sb.AppendLine($"shares of {e.Args[2]}: {(shares is null ? "(取得できず)" : shares.Count + " 件")} {sw.ElapsedMilliseconds} ms");
+                    foreach (var s in shares ?? new List<string>()) sb.AppendLine("  " + s);
+                }
+                else
+                {
+                    var hosts = Services.NetworkBrowser.ShellHosts(h => sb.AppendLine($"  {sw.ElapsedMilliseconds,6} ms  {h}"));
+                    sb.AppendLine($"shell hosts: {hosts.Count} 件 {sw.ElapsedMilliseconds} ms");
+                    sw.Restart();
+                    hosts = Services.NetworkBrowser.WNetHosts();
+                    sb.AppendLine($"wnet hosts: {hosts.Count} 件 {sw.ElapsedMilliseconds} ms");
+                    foreach (var h in hosts) sb.AppendLine("  " + h);
+                }
+                File.WriteAllText(e.Args[1], sb.ToString(), System.Text.Encoding.UTF8);
+            }
+            catch (Exception ex) { try { File.WriteAllText(e.Args[1], "ERROR: " + ex); } catch { } }
+            Shutdown();
+            return;
+        }
         // すべてのウィンドウ（ダイアログ含む）にアプリアイコンを付ける
         EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent, new RoutedEventHandler((s, _) =>
         {

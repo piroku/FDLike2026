@@ -46,7 +46,7 @@ public sealed class Settings
     /// <summary>隠し属性のフォルダ/ファイルの並べ方: "mixed" / "first"（WinFM と同じ、既定）/ "last"</summary>
     public string HiddenGrouping { get; set; } = "first";
 
-    /// <summary>J: JumpFolder の登録先。キーは "F1".."F12" / "A".."Z"。</summary>
+    /// <summary>J: JumpFolder の登録先。キーは "F1".."F12" / "A".."Z" / "01".."65"。</summary>
     public Dictionary<string, string> JumpFolders { get; set; } = new();
 
     /// <summary>F2: コマンドマクロ。キーは "A".."Z" / "1".."9"、値は「タイトル,コマンド」。</summary>
