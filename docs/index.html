@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDLike2026 - FD / WinFM2008 の操作体系を受け継いだ Windows 11 向け 2 画面ファイラー</title>
+<meta name="description" content="FDLike2026 は、FD / FILMTN / WinFM2008 の操作体系を受け継いだ、Windows 11 向けのキーボード中心 2 画面ファイラーです。WinFM2008 互換のキー配置と画面構成、ビューア、grep、zip に対応。無料・MIT ライセンス。">
+<link rel="canonical" href="https://piroku.github.io/FDLike2026/">
+<link rel="icon" type="image/png" href="icon_256.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="FDLike2026 - Windows 11 向けキーボード中心 2 画面ファイラー">
+<meta property="og:description" content="FD / FILMTN / WinFM2008 の操作体系を受け継いだ、Windows 11 向けのファイラー。">
+<meta property="og:url" content="https://piroku.github.io/FDLike2026/">
+<meta property="og:image" content="https://piroku.github.io/FDLike2026/screenshot.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --navy: #000040;
+    --navy-2: #00005a;
+    --cyan: #00e0e0;
+    --yellow: #ffff40;
+    --green: #40ff40;
+    --magenta: #ff60ff;
+    --text: #e8e8f0;
+    --dim: #a8a8c8;
+    --mono: "BIZ UDGothic", "BIZ UDゴシック", "MS Gothic", "Osaka-Mono", Menlo, Consolas, monospace;
+    --sans: "BIZ UDPGothic", "BIZ UDPゴシック", "Yu Gothic UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--navy);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  a { color: var(--cyan); }
+  a:hover { color: var(--yellow); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* ファンクション行 */
+  .fn {
+    font-family: var(--mono);
+    font-size: 14px;
+    border-bottom: 1px solid var(--cyan);
+    background: var(--navy);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .fn .wrap { display: flex; flex-wrap: wrap; gap: 4px 18px; padding-top: 6px; padding-bottom: 6px; align-items: center; }
+  .fn a { color: var(--text); text-decoration: none; white-space: nowrap; }
+  .fn a b { color: var(--cyan); font-weight: normal; }
+  .fn a:hover { color: var(--yellow); }
+  .fn .name { margin-left: auto; color: var(--dim); }
+
+  header.hero { padding: 56px 0 32px; text-align: center; }
+  .hero img.icon { width: 96px; height: 96px; }
+  .hero h1 {
+    font-family: var(--mono);
+    font-size: clamp(36px, 7vw, 60px);
+    margin: 12px 0 8px;
+    color: var(--yellow);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+  }
+  .hero p.lead { font-size: clamp(16px, 2.4vw, 20px); margin: 0 auto 28px; max-width: 760px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .btn {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 17px;
+    padding: 12px 26px;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    text-decoration: none;
+  }
+  .btn.primary { background: var(--cyan); color: var(--navy); font-weight: bold; }
+  .btn:hover { background: var(--yellow); border-color: var(--yellow); color: var(--navy); }
+  @media (max-width: 640px) { .hero p.lead br { display: none; } }
+  .hero .note { color: var(--dim); font-size: 14px; margin-top: 14px; }
+
+  figure { margin: 0; }
+  figure img { display: block; width: 100%; height: auto; border: 1px solid var(--cyan); }
+  figcaption { color: var(--dim); font-size: 14px; text-align: center; margin-top: 8px; }
+
+  section { padding: 44px 0 8px; }
+  /* 情報ボックス風の見出し */
+  h2 {
+    font-family: var(--mono);
+    font-size: 22px;
+    color: var(--yellow);
+    margin: 0 0 20px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--cyan);
+    font-weight: normal;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+  .box { border: 1px solid var(--cyan); padding: 16px 18px; background: var(--navy-2); }
+  .box h3 { font-family: var(--mono); font-size: 17px; color: var(--green); margin: 0 0 6px; font-weight: normal; }
+  .box p { margin: 0; font-size: 15px; }
+
+  .keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 6px 24px; font-family: var(--mono); font-size: 15px; list-style: none; padding: 0; margin: 0 0 14px; }
+  .keys b { color: var(--cyan); font-weight: normal; display: inline-block; min-width: 5.5em; }
+
+  ol.steps { padding-left: 1.4em; margin: 0; }
+  ol.steps li { margin-bottom: 8px; }
+  code { font-family: var(--mono); color: var(--magenta); font-size: 0.95em; }
+  ul.plain { padding-left: 1.3em; margin: 0; }
+  .en { color: var(--dim); font-size: 15px; }
+
+  footer { margin-top: 56px; border-top: 1px solid var(--cyan); padding: 18px 0 28px; color: var(--dim); font-size: 14px; font-family: var(--mono); }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 6px 20px; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<nav class="fn" aria-label="ページ内メニュー">
+  <div class="wrap">
+    <a href="#features"><b>F:</b>特徴</a>
+    <a href="#keys"><b>K:</b>キー操作</a>
+    <a href="#install"><b>I:</b>インストール</a>
+    <a href="#english"><b>E:</b>English</a>
+    <a href="https://github.com/piroku/FDLike2026"><b>G:</b>GitHub</a>
+    <span class="name">FDLike2026</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <img class="icon" src="icon_256.png" alt="FDLike2026 のアイコン" width="96" height="96">
+    <h1>FDLike2026</h1>
+    <p class="lead">FD / FILMTN / WinFM2008 の操作体系を受け継いだ、<br>Windows 11 向けのキーボード中心 2 画面ファイラー</p>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/piroku/FDLike2026/releases/latest">ダウンロード（最新版）</a>
+      <a class="btn" href="https://github.com/piroku/FDLike2026">GitHub で見る</a>
+    </div>
+    <p class="note">無料 / MIT ライセンス / インストーラー不要の zip 配布</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <figure>
+      <img src="screenshot.png" alt="FDLike2026 のメイン画面。紺地にシアンの枠、左にフォルダツリー、中央と右に 2 つのファイル一覧" width="1426" height="853">
+      <figcaption>メイン画面（配色 Classic）</figcaption>
+    </figure>
+
+    <section>
+      <p>MS-DOS 時代の FD、そして Windows で長く使われた WinFM2008。「キーボードだけで気持ちよくファイルを扱える」あの操作感を Windows 11 でも使い続けたくて作った、ゼロから書き起こした独立したソフトです。WinFM2008 のコードは含まず、作者とも無関係です。</p>
+    </section>
+
+    <section id="features">
+      <h2>特徴</h2>
+      <div class="grid">
+        <div class="box">
+          <h3>WinFM2008 互換のキー配置と画面</h3>
+          <p>ファンクション行、情報ボックス、ツリー＋左右ウィンドウ、メッセージ行。配色「Classic」は紺地にシアン枠・黄色数字。</p>
+        </div>
+        <div class="box">
+          <h3>1 キーで操作</h3>
+          <p>C 複写、M 移動、D 削除、N 名前、E 編集、V ビューア、T ツリー、J JumpFolder、F 検索、P・U で zip 圧縮・解凍。</p>
+        </div>
+        <div class="box">
+          <h3>ビューア（V）</h3>
+          <p>テキスト / HEX、Markdown、ソースの色分け、画像（GIF アニメ対応）、CSV の表、PDF / HTML、Word / Excel / PowerPoint の抽出テキスト。</p>
+        </div>
+        <div class="box">
+          <h3>grep（Shift+F）</h3>
+          <p>文字列検索の結果から移動、該当行をビューアやエディタで開く。docx / xlsx / pptx / PDF の中身も検索します。</p>
+        </div>
+        <div class="box">
+          <h3>Windows との連携</h3>
+          <p>エクスプローラーとのドラッグ＆ドロップやコピー＆貼り付け、右クリックで Windows のメニュー、ごみ箱、<code>\\server\share</code> や <code>file://</code> のパスへそのまま移動。</p>
+        </div>
+        <div class="box">
+          <h3>カスタマイズ（F10）</h3>
+          <p>配色 12 種と約 40 項目の色指定、フォント、表示モード、エディタ・比較ツールの指定。F2 のコマンドマクロ、F4 の拡張子対応。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <figure>
+        <img src="screenshot-viewer.png" alt="FDLike2026 のビューアで Markdown ファイルを整形表示している画面" width="1424" height="848" loading="lazy">
+        <figcaption>ビューアで Markdown を表示</figcaption>
+      </figure>
+    </section>
+
+    <section id="keys">
+      <h2>キー操作（抜粋）</h2>
+      <ul class="keys">
+        <li><b>↑↓ / Tab</b>移動 / 左右切替</li>
+        <li><b>Space</b>タグ</li>
+        <li><b>C / M</b>複写 / 移動</li>
+        <li><b>D</b>削除（ごみ箱）</li>
+        <li><b>N</b>名前の変更</li>
+        <li><b>E</b>編集</li>
+        <li><b>V</b>ビューア</li>
+        <li><b>T</b>ツリー</li>
+        <li><b>J</b>JumpFolder</li>
+        <li><b>F</b>ファイルの検索</li>
+        <li><b>Shift+F</b>grep</li>
+        <li><b>P / U</b>zip 圧縮 / 解凍</li>
+        <li><b>S</b>ソート</li>
+        <li><b>F10</b>カスタマイズ</li>
+        <li><b>F1 / ?</b>ヘルプ</li>
+      </ul>
+      <p>すべてのキーは <a href="https://github.com/piroku/FDLike2026#readme">README</a> と、起動後の F1 ヘルプにあります。</p>
+    </section>
+
+    <section id="install">
+      <h2>動作環境とインストール</h2>
+      <ul class="plain">
+        <li>Windows 11（Windows 10 でも動作します）、x64</li>
+        <li><a href="https://dotnet.microsoft.com/ja-jp/download/dotnet/8.0">.NET 8 Desktop Runtime</a>（x64）</li>
+      </ul>
+      <ol class="steps" style="margin-top:16px">
+        <li><a href="https://github.com/piroku/FDLike2026/releases/latest">Releases</a> から zip をダウンロードし、好きな場所に展開します（Program Files 配下は避けてください）。</li>
+        <li><code>FDLike2026.exe</code> を起動します。</li>
+        <li>初回に SmartScreen の「Windows によって PC が保護されました」が出た場合は「詳細情報」→「実行」を押してください（コード署名をしていないため表示されます）。</li>
+      </ol>
+      <p>レジストリには書きません。アンインストールは展開したフォルダを削除するだけです。UI とヘルプは日本語のみです。</p>
+    </section>
+
+    <section>
+      <h2>不具合報告・要望</h2>
+      <p><a href="https://github.com/piroku/FDLike2026/issues">GitHub の Issues</a> へお願いします。変更履歴は <a href="https://github.com/piroku/FDLike2026/blob/main/CHANGELOG.md">CHANGELOG</a>、WinFM2008 の機能ごとの対応状況は<a href="https://github.com/piroku/FDLike2026/blob/main/docs/WinFM2008%E6%A9%9F%E8%83%BD%E5%AF%BE%E5%BF%9C%E8%A1%A8.md">機能対応表</a>にあります。</p>
+      <p>FDLike2026 は WinFM2008 の作者とは無関係の独立したソフトです。先人への謝辞は <a href="https://github.com/piroku/FDLike2026#%E8%AC%9D%E8%BE%9E--acknowledgements">README の謝辞</a>をご覧ください。</p>
+    </section>
+
+    <section id="english" lang="en">
+      <h2>English</h2>
+      <p class="en">FDLike2026 is a keyboard-driven, two-pane file manager for Windows 11, written in C# / WPF (.NET 8). It follows the key bindings, screen layout and classic color scheme of WinFM2008, a long-lived Windows filer in the lineage of FD, the MS-DOS file manager from Japan. It is an independent implementation written from scratch and is not affiliated with the author of WinFM2008. The UI is Japanese only. Download a zip from the <a href="https://github.com/piroku/FDLike2026/releases/latest">Releases page</a>, extract it and run <code>FDLike2026.exe</code> (.NET 8 Desktop Runtime required). Licensed under MIT.</p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>FDLike2026 &copy; 2026 piroku / MIT License</span>
+    <span><a href="https://github.com/piroku/FDLike2026">github.com/piroku/FDLike2026</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
