@@ -180,9 +180,21 @@ public sealed class Settings
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+            // JumpFolder は画面と同じ並び（F1～F12、A～Z、01～65）で書き出す（手で編集するときに探しやすくするため）
+            JumpFolders = JumpFolders.OrderBy(kv => JumpKeyRank(kv.Key)).ThenBy(kv => kv.Key, StringComparer.Ordinal)
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
             File.WriteAllText(FilePath, JsonSerializer.Serialize(this, JsonOpt));
         }
         catch { }
+    }
+
+    /// <summary>JumpFolder のキーの並び順（F1～F12 → A～Z → 01～65 → その他）。</summary>
+    private static int JumpKeyRank(string key)
+    {
+        if (key.Length >= 2 && key[0] == 'F' && int.TryParse(key.AsSpan(1), out var f) && f >= 1 && f <= 12) return f;
+        if (key.Length == 1 && key[0] >= 'A' && key[0] <= 'Z') return 100 + (key[0] - 'A');
+        if (key.Length == 2 && char.IsAsciiDigit(key[0]) && char.IsAsciiDigit(key[1])) return 200 + int.Parse(key);
+        return 1000;
     }
 }
 
