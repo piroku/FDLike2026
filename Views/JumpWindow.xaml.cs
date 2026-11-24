@@ -142,8 +142,8 @@ public partial class JumpWindow : Window
         switch (key)
         {
             case Key.Escape: Close(); return;
-            case Key.Up: Move(-1); return;
-            case Key.Down: Move(1); return;
+            case Key.Up: if (Keyboard.Modifiers == ModifierKeys.Control) Swap(-1); else Move(-1); return;
+            case Key.Down: if (Keyboard.Modifiers == ModifierKeys.Control) Swap(1); else Move(1); return;
             case Key.PageUp: Move(-10); return;
             case Key.PageDown: Move(10); return;
             case Key.Home: List.SelectedIndex = 0; List.ScrollIntoView(Current); return;
@@ -224,6 +224,23 @@ public partial class JumpWindow : Window
         if (string.IsNullOrEmpty(path)) _settings.JumpFolders.Remove(slot.Key);
         else _settings.JumpFolders[slot.Key] = path;
         _settings.Save();
+    }
+
+    /// <summary>選択行の登録先を、上（-1）/ 下（+1）の行と入れ替える。カーソルも一緒に動く（押し続ければそのまま運べる）。</summary>
+    private void Swap(int delta)
+    {
+        int i = List.SelectedIndex, j = i + delta;
+        if (i < 0 || j < 0 || j >= _slots.Count) return;
+        var (a, b) = (_slots[i], _slots[j]);
+        if (a.Path.Length == 0 && b.Path.Length == 0) { Move(delta); return; }
+        (a.Path, b.Path) = (b.Path, a.Path);
+        foreach (var s in new[] { a, b })
+        {
+            if (string.IsNullOrEmpty(s.Path)) _settings.JumpFolders.Remove(s.Key);
+            else _settings.JumpFolders[s.Key] = s.Path;
+        }
+        _settings.Save();
+        Move(delta);
     }
 
     private void Edit(JumpSlot slot)
