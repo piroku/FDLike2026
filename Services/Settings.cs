@@ -102,6 +102,8 @@ public sealed class Settings
     {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        // 日本語や < > を \uXXXX にせず、そのまま書き出す（settings.json を手で編集しやすくするため。読み込みはどちらの表記でも可）
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     public static Settings Load()
