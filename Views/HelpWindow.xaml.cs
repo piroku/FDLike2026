@@ -84,6 +84,7 @@ public partial class HelpWindow : Window
             new HelpRow("Shift+E", "（バイナリエディタ：未設定時はエディタで開く）"),
             new HelpRow("V", "ビューア（docx/xlsx/pptx/doc/xls/ppt は中身のテキストを抽出して表示、/ または Ctrl+F でファイル内検索、n / Shift+N で次 / 前。テキスト / HEX 自動判定、.md は Markdown 整形、.csv/.tsv は表表示（T 先頭行を見出し、M でテキスト）、.pdf/.html は Edge のビューア（WebView2）、ソースは VS Code 風の色分け＋行番号（M で切替）、jpg/png/gif/bmp/webp は画像表示（←→ で前後、+/- で拡大縮小、0 全体、1 等倍）、zip は中身の一覧）"),
             new HelpRow("ビューア内のキー", "↑↓ 1 行スクロール、←→ 横、PgUp/PgDn・Space/BackSpace 1 ページ、Shift+Home/End 先頭/末尾、/ または Ctrl+F 検索、n / Shift+N 次 / 前の該当（末尾まで行くと先頭へ巡回。色分け表示では該当行に ► 印と帯）、M 整形/色分け切替、W 折り返し、H HEX、E エディタ（grep から開いたときは該当行へ）、Esc/Q 閉じる"),
+            new HelpRow("ビューアの複数表示", "V で開いたビューアは独立したウィンドウ。閉じなくてもファイラーに戻れ（クリック / Alt+Tab）、別のファイルを V で続けて開ける。表示中のファイルで V を押すとそのビューアを手前に出す。ファイラーを終了するとすべて閉じる"),
             new HelpRow("Z", "エクスプローラーで表示"),
             new HelpRow("B", "カレントフォルダで PowerShell を開く"),
             new HelpRow("F3", "DOS シェル（Windows Terminal → cmd）"),

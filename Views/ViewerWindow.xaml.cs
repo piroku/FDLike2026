@@ -50,6 +50,60 @@ public partial class ViewerWindow : Window
     private int _siblingIndex = -1;
     private Point _dragStart; private double _dragH, _dragV; private bool _dragging;
 
+    // ---- 複数同時表示（一覧の V で開いたビューアは独立したウィンドウ） ----
+    private static readonly List<ViewerWindow> OpenViewers = new();
+
+    /// <summary>同じファイルを表示中の独立ビューアがあれば、それを手前に出して true を返す。</summary>
+    public static bool ActivateIfOpen(string path)
+    {
+        var w = OpenViewers.FirstOrDefault(v => v._path.Length > 0 && string.Equals(v._path, path, StringComparison.OrdinalIgnoreCase));
+        if (w is null) return false;
+        if (w.WindowState == WindowState.Minimized) w.WindowState = WindowState.Normal;
+        w.Activate();
+        return true;
+    }
+
+    /// <summary>
+    /// 独立したウィンドウとして開く（閉じなくてもメイン画面に戻れて、別のファイルも続けて開ける）。
+    /// 持ち主を外すので、メイン画面の後ろにも回せて、タスクバーにも個別に出る。メイン画面を閉じると一緒に閉じる。
+    /// </summary>
+    public void ShowIndependent()
+    {
+        var main = Owner;
+        Owner = null;
+        ShowInTaskbar = true;
+        if (_path.Length > 0) Title = $"{Path.GetFileName(_path)} - FDLike2026 ビューア";
+        if (main is null) { Show(); return; }
+
+        // メイン画面の中央に。2 枚目以降は少しずつ右下へずらして、下のウィンドウのタイトルが見えるようにする
+        WindowStartupLocation = WindowStartupLocation.Manual;
+        try
+        {
+            var origin = main.PointToScreen(new Point(0, 0));
+            if (PresentationSource.FromVisual(main)?.CompositionTarget is { } ct) origin = ct.TransformFromDevice.Transform(origin);
+            int step = OpenViewers.Count % 8;
+            double left = origin.X + (main.ActualWidth - Width) / 2 + step * 28;
+            double top = origin.Y + (main.ActualHeight - Height) / 2 + step * 28;
+            Left = Math.Max(SystemParameters.VirtualScreenLeft, left);
+            Top = Math.Max(SystemParameters.VirtualScreenTop, top);
+        }
+        catch { WindowStartupLocation = WindowStartupLocation.CenterScreen; }
+
+        bool mainClosed = false, wasActive = false;
+        EventHandler onMainClosed = (_, _) => { mainClosed = true; Close(); };
+        main.Closed += onMainClosed;
+        Closing += (_, _) => wasActive = IsActive;
+        Closed += (_, _) =>
+        {
+            main.Closed -= onMainClosed;
+            OpenViewers.Remove(this);
+            // 持ち主が無いと、閉じたあと別のアプリが手前に来ることがあるので、メイン画面へ戻す
+            if (wasActive && !mainClosed) main.Activate();
+        };
+        OpenViewers.Add(this);
+        Show();
+    }
+
     /// <summary>任意のテキストを表示する（書庫の一覧など）。</summary>
     public ViewerWindow(Window owner, string title, string text, bool isText)
     {

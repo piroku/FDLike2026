@@ -106,6 +106,8 @@ public partial class MainWindow : Window
 
     private void ApplyRightPane(bool show)
     {
+        // 境界をドラッグすると左の列の幅も「600*」のような値に書き換わる。左を 1* に戻さないと、右が 1/600 の幅になって見えなくなる。
+        LeftColumn.Width = new GridLength(1, GridUnitType.Star);
         RightColumn.Width = show ? new GridLength(Math.Max(0.1, _vm.Settings.PaneRatio <= 0 ? 1 : 1 / _vm.Settings.PaneRatio), GridUnitType.Star) : new GridLength(0);
         PaneSplitColumn.Width = show ? new GridLength(6) : new GridLength(0);
         PaneSplitter.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
@@ -817,10 +819,15 @@ public partial class MainWindow : Window
         if (cur is null || cur.IsDirectory) return;
         if (ArchiveService.IsArchive(cur.FullPath))
         {
-            Try(() => new ViewerWindow(this, $"{cur.FullPath}  [書庫の内容]", ArchiveService.ListText(cur.FullPath), true).ShowDialog(), "書庫の表示");
+            Try(() => new ViewerWindow(this, $"{cur.FullPath}  [書庫の内容]", ArchiveService.ListText(cur.FullPath), true).ShowIndependent(), "書庫の表示");
             return;
         }
-        Try(() => new ViewerWindow(this, cur.FullPath, _vm.Settings.EditorPath).ShowDialog(), "ビューア");
+        // 独立したウィンドウで開く（閉じなくても次のファイルを開ける）。同じファイルを表示中ならそれを手前に出す
+        Try(() =>
+        {
+            if (!ViewerWindow.ActivateIfOpen(cur.FullPath))
+                new ViewerWindow(this, cur.FullPath, _vm.Settings.EditorPath).ShowIndependent();
+        }, "ビューア");
     }
 
     private void CmdDrive()

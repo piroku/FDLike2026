@@ -396,7 +396,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="TreeColumn" Width="260"/>
                 <ColumnDefinition x:Name="TreeSplitColumn" Width="6"/>
-                <ColumnDefinition Width="*" MinWidth="120"/>
+                <ColumnDefinition x:Name="LeftColumn" Width="*" MinWidth="120"/>
                 <ColumnDefinition x:Name="PaneSplitColumn" Width="6"/>
                 <ColumnDefinition x:Name="RightColumn" Width="*"/>
             </Grid.ColumnDefinitions>
