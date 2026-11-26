@@ -12,4 +12,4 @@ Set-Location (Split-Path $PSScriptRoot -Parent)
 git add -A
 if ($Amend) { git commit -q --amend --no-edit } else { git commit -q -m $Message }
 git log --oneline -1
-Start-Process -FilePath (Resolve-Path 'bin\Release\net8.0-windows\FDLike2026.exe')
+Start-Process -FilePath (Resolve-Path 'bin\Release\net10.0-windows\FDLike2026.exe')

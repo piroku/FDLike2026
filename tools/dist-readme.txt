@@ -6,10 +6,17 @@ Windows 11（Windows 10 でも動作します）用。
 
 ■ 動かすのに必要なもの
 
-  ・.NET 8 Desktop Runtime（x64）
-      https://dotnet.microsoft.com/ja-jp/download/dotnet/8.0
-      「.NET デスクトップ ランタイム 8.0.x」の Windows x64 インストーラーを入れてください。
-      入っていないと起動時に「.NET をインストールしてください」という案内が出ます。
+  ・.NET 10 デスクトップ ランタイム（x64）。Microsoft が無料で配布しています。
+      本体の zip には含めていないので、入っていない PC では先に入れてください。
+        1. https://dotnet.microsoft.com/ja-jp/download/dotnet/10.0 を開きます。
+        2. 「アプリの実行 - ランタイム」の中にある「.NET デスクトップ ランタイム 10.0.x」の表で、
+           Windows の「インストーラー」の x64 を押します。
+           （「SDK」「ASP.NET Core ランタイム」「.NET Runtime」では起動しません）
+        3. ダウンロードした windowsdesktop-runtime-10.0.x-win-x64.exe を実行し、
+           「インストール」を押します。
+      入れずに起動すると「You must install .NET Desktop Runtime to run this application.」という
+      英語のメッセージが出ます。「Download it now」を押すとダウンロードページが開きます。
+      ※ v0.2.4 までは .NET 8 用でした。v0.2.5 からは .NET 10 が必要です。
   ・Microsoft Edge WebView2 ランタイム（PDF / HTML の表示に使用）
       Windows 11 には最初から入っています。無い場合は
       https://developer.microsoft.com/ja-jp/microsoft-edge/webview2/ から「Evergreen ブートストラップ」を。

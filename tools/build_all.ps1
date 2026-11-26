@@ -27,5 +27,5 @@ foreach ($c in 'Debug', 'Release') {
     Write-Output "OK ($c)"
 }
 if (-not $NoRun) {
-    Start-Process -FilePath (Resolve-Path 'bin\Release\net8.0-windows\FDLike2026.exe')
+    Start-Process -FilePath (Resolve-Path 'bin\Release\net10.0-windows\FDLike2026.exe')
 }

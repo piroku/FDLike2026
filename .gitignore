@@ -7,3 +7,6 @@ build.log
 *.log
 docs/_shot.png
 publish/
+
+# Claude の作業用出力（リポジトリには入れない）
+Claude outputs/

@@ -2,10 +2,10 @@
 
 **FD / FILMTN / WinFM2008 の操作体系を受け継いだ、Windows 11 向けのキーボード中心 2 画面ファイラー**
 
-> FDLike2026 is a keyboard-driven, two-pane file manager for Windows 11, written in C# / WPF (.NET 8).
+> FDLike2026 is a keyboard-driven, two-pane file manager for Windows 11, written in C# / WPF (.NET 10).
 > It faithfully follows the key bindings, screen layout and classic color scheme of WinFM2008, a long-lived
 > Windows filer in the lineage of FD, the legendary MS-DOS file manager from Japan. The UI is Japanese only.
-> Download a zip from the Releases page, extract it and run `FDLike2026.exe` (.NET 8 Desktop Runtime required).
+> Download a zip from the Releases page, extract it and run `FDLike2026.exe` (.NET 10 Desktop Runtime required).
 > Licensed under MIT. See [Acknowledgements](#謝辞--acknowledgements) below.
 
 ![FDLike2026 のメイン画面（Classic 配色）](docs/screenshot.png)
@@ -28,8 +28,22 @@ MS-DOS 時代の FD、そして Windows で長く使われた WinFM2008。「キ
 ## 動作環境
 
 - Windows 11（Windows 10 でも動作します）、x64
-- [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/ja-jp/download/dotnet/8.0)（x64）。入っていないと起動時にインストールの案内が出ます。
+- [.NET 10 デスクトップ ランタイム](https://dotnet.microsoft.com/ja-jp/download/dotnet/10.0)（x64）。無料です。入れ方は下の「[.NET 10 デスクトップ ランタイムの入れ方](#net-10-デスクトップ-ランタイムの入れ方)」を見てください。
 - Microsoft Edge WebView2 ランタイム（PDF / HTML の表示に使用。Windows 11 には最初から入っています。無い場合は [Evergreen ブートストラップ](https://developer.microsoft.com/ja-jp/microsoft-edge/webview2/) を）
+
+### .NET 10 デスクトップ ランタイムの入れ方
+
+FDLike2026 は Microsoft の .NET 10 で動きます。本体の zip には含めていないので、入っていない PC では先に入れてください（1 回だけ。管理者の権限が必要です）。
+
+1. Microsoft の [.NET 10 のダウンロードページ](https://dotnet.microsoft.com/ja-jp/download/dotnet/10.0) を開きます。
+2. 「アプリの実行 - ランタイム」の中にある「**.NET デスクトップ ランタイム 10.0.x**」の表で、Windows の「インストーラー」の **x64** を押します。同じページに並んでいる「SDK」「ASP.NET Core ランタイム」「.NET Runtime」では FDLike2026 は起動しません。
+3. ダウンロードした `windowsdesktop-runtime-10.0.x-win-x64.exe` を実行し、「インストール」を押します。
+
+コマンドで入れる場合は、ターミナルで `winget install Microsoft.DotNet.DesktopRuntime.10` を実行します。
+
+- **入れずに起動した場合**: 「You must install .NET Desktop Runtime to run this application.」という英語のメッセージが出ます。「Download it now」を押すとダウンロードページが開くので、インストールしてから FDLike2026 を起動し直してください。
+- **入っているか確かめる**: ターミナルで `dotnet --list-runtimes` を実行し、`Microsoft.WindowsDesktop.App 10.0.x` の行があれば入っています。
+- **v0.2.4 までを使っていた場合**: v0.2.4 までは .NET 8 用でした。.NET 8 は 2026 年 11 月にサポートが終わったため、v0.2.5 から .NET 10 用にしています。.NET 10 デスクトップ ランタイムを新しく入れてください（.NET 8 は入れたままでも構いません）。
 
 ## インストール
 
@@ -142,7 +156,7 @@ WinFM2008 の「カスタマイズ」相当の画面です。
 
 ## ビルド
 
-Visual Studio 2022 または .NET 8 SDK。
+Visual Studio 2026 または .NET 10 SDK。
 
 ```
 dotnet build
@@ -152,7 +166,7 @@ dotnet run
 配布用 zip（単一 EXE ＋ README / CHANGELOG / LICENSE / THIRD-PARTY-NOTICES / はじめにお読みください.txt）:
 
 ```
-.\tools\publish.ps1                 # publish\FDLike2026-v<版>-win-x64.zip（約 3 MB。.NET 8 Desktop Runtime は利用者側で導入）
+.\tools\publish.ps1                 # publish\FDLike2026-v<版>-win-x64.zip（約 3 MB。.NET 10 デスクトップ ランタイムは利用者側で導入）
 .\tools\publish.ps1 -SelfContained  # ランタイム同梱版（.NET が無い PC でも動く。150 MB 前後）
 ```
 
@@ -169,7 +183,7 @@ FDLike2026/
   Services/             ファイル操作・複写エンジン・zip・grep / 文書テキスト抽出・シェル連携（コンテキストメニュー、貼り付け、アイコン）・設定・配色・マクロ展開・パス整形
   Views/                各ダイアログ（複写/移動、実行、検索、grep、JumpFolder、マクロ、ミラー、一括リネーム …）、ビューア、ヘルプ
   tools/                build_all.ps1 / publish.ps1 / commit.ps1 / dist-readme.txt
-  docs/                 WinFM2008 機能対応表、アイコン
+  docs/                 紹介ページ（GitHub Pages）、WinFM2008 機能対応表、アイコン
 ```
 
 利用ライブラリ: [Markdig](https://github.com/xoofx/markdig)（Markdown）、[WpfAnimatedGif](https://github.com/XamlAnimatedGif/WpfAnimatedGif)（GIF）、[Microsoft.Web.WebView2](https://developer.microsoft.com/microsoft-edge/webview2/)（PDF / HTML）、[Emoji.Wpf](https://github.com/samhocevar/emoji.wpf)（カラー絵文字）、[PdfPig](https://github.com/UglyToad/PdfPig)（PDF テキスト抽出）。詳細は [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。

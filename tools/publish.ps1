@@ -1,5 +1,5 @@
 ﻿# FDLike2026 の配布 zip を作る。
-#   .\tools\publish.ps1                 … .NET 8 Desktop Runtime が必要な軽量版（既定）
+#   .\tools\publish.ps1                 … .NET 10 Desktop Runtime が必要な軽量版（既定）
 #   .\tools\publish.ps1 -SelfContained  … ランタイム同梱版（.NET が無い PC でも動く。150MB 前後）
 # 出来上がり: publish\FDLike2026-v<版>-win-x64[-selfcontained].zip
 param(

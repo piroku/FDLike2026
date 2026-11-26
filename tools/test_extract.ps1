@@ -1,7 +1,7 @@
 ﻿# DocumentText の抽出を実ファイルで確認する（FDLike2026.exe --extract 経由）
 param([string]$Root = "$env:USERPROFILE\Documents", [int]$PerExt = 1)
 Set-Location (Split-Path $PSScriptRoot -Parent)
-$exe = Resolve-Path 'bin\Debug\net8.0-windows\FDLike2026.exe'
+$exe = Resolve-Path 'bin\Debug\net10.0-windows\FDLike2026.exe'
 $out = Join-Path $env:TEMP 'fdlike_extract.txt'
 foreach ($ext in '.docx', '.xlsx', '.pptx', '.pdf', '.doc', '.xls', '.ppt') {
     $files = Get-ChildItem -Path $Root -Recurse -File -Filter "*$ext" -ErrorAction SilentlyContinue | Where-Object { $_.Length -lt 20MB } | Select-Object -First $PerExt

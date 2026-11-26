@@ -11,7 +11,7 @@ FDLike2026 は以下のオープンソース ライブラリを利用してい�
 | [Emoji.Wpf](https://github.com/samhocevar/emoji.wpf) 0.3.4 | Markdown 表示のカラー絵文字 | WTFPL — Copyright (c) Sam Hocevar。絵文字グラフィックは [Twemoji](https://github.com/twitter/twemoji)（Copyright 2020 Twitter, Inc and other contributors）を [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) で利用 |
 | [PdfPig](https://github.com/UglyToad/PdfPig) 0.1.9 | PDF からのテキスト抽出（grep） | Apache License 2.0 — Copyright (c) UglyToad / Eliot Jones |
 
-.NET 8 ランタイム（Microsoft）は MIT ライセンスで提供されており、本ソフトには同梱していません（利用者側でインストール）。
+.NET 10 ランタイム（Microsoft）は MIT ライセンスで提供されており、本ソフトには同梱していません（利用者側でインストール）。
 
 各ライセンスの全文は上記リンク先、または NuGet パッケージ（`%USERPROFILE%\.nuget\packages\<名前>\<版>\`）に含まれています。
 
